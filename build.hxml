@@ -1,6 +1,10 @@
 -cp src
 
 # Uncomment the desirable target
+# JavaScript target (testing)
+-js out/canvasspec.js
+-main furytest.BuildingBlocksTest
+
 # JavaScript target
 # -js out/furytile.js
 
