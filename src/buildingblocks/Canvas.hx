@@ -52,7 +52,7 @@ class Canvas {
 			var position = image.Jsonify().position ;
 			var size = image.Jsonify().size;
 			var skew = { cos : Math.cos(image.Jsonify().angle), sin : Math.sin(image.Jsonify().angle) };
-			Canvas.Context.setTransform(1, 0, 0, 1, 0, 0);
+			Canvas.Context.setTransform(skew.cos, skew.sin, -skew.sin, skew.cos, 0, 0);
 			Canvas.Context.drawImage(image.Source(), source_position.x, source_position.y, source_size.width, source_size.height, position.x * width / 100, position.y * height / 100 + band_height, size.width * width / 100, size.height * height / 100); // drawImage
 		} // for image
 		
