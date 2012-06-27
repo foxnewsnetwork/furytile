@@ -119,6 +119,98 @@ buildingblocks.Image.prototype.Source = function() {
 	return this.source;
 }
 buildingblocks.Image.prototype.__class__ = buildingblocks.Image;
+haxe.Public = function() { }
+haxe.Public.__name__ = ["haxe","Public"];
+haxe.Public.prototype.__class__ = haxe.Public;
+if(!haxe.unit) haxe.unit = {}
+haxe.unit.TestCase = function(p) {
+}
+haxe.unit.TestCase.__name__ = ["haxe","unit","TestCase"];
+haxe.unit.TestCase.prototype.currentTest = null;
+haxe.unit.TestCase.prototype.setup = function() {
+}
+haxe.unit.TestCase.prototype.tearDown = function() {
+}
+haxe.unit.TestCase.prototype.print = function(v) {
+	haxe.unit.TestRunner.print(v);
+}
+haxe.unit.TestCase.prototype.assertTrue = function(b,c) {
+	this.currentTest.done = true;
+	if(b == false) {
+		this.currentTest.success = false;
+		this.currentTest.error = "expected true but was false";
+		this.currentTest.posInfos = c;
+		throw this.currentTest;
+	}
+}
+haxe.unit.TestCase.prototype.assertFalse = function(b,c) {
+	this.currentTest.done = true;
+	if(b == true) {
+		this.currentTest.success = false;
+		this.currentTest.error = "expected false but was true";
+		this.currentTest.posInfos = c;
+		throw this.currentTest;
+	}
+}
+haxe.unit.TestCase.prototype.assertEquals = function(expected,actual,c) {
+	this.currentTest.done = true;
+	if(actual != expected) {
+		this.currentTest.success = false;
+		this.currentTest.error = "expected '" + expected + "' but was '" + actual + "'";
+		this.currentTest.posInfos = c;
+		throw this.currentTest;
+	}
+}
+haxe.unit.TestCase.prototype.__class__ = haxe.unit.TestCase;
+haxe.unit.TestCase.__interfaces__ = [haxe.Public];
+if(typeof haxespec=='undefined') haxespec = {}
+haxespec.FuryTestCase = function(p) {
+	if( p === $_ ) return;
+	haxe.unit.TestCase.call(this);
+}
+haxespec.FuryTestCase.__name__ = ["haxespec","FuryTestCase"];
+haxespec.FuryTestCase.__super__ = haxe.unit.TestCase;
+for(var k in haxe.unit.TestCase.prototype ) haxespec.FuryTestCase.prototype[k] = haxe.unit.TestCase.prototype[k];
+haxespec.FuryTestCase.prototype.assertIncludes = function(array,expected) {
+	var flag = false;
+	var _g = 0;
+	while(_g < array.length) {
+		var given = array[_g];
+		++_g;
+		if(given == expected) {
+			flag = true;
+			break;
+		}
+	}
+	this.assertTrue(flag,{ fileName : "FuryTestCase.hx", lineNumber : 12, className : "haxespec.FuryTestCase", methodName : "assertIncludes"});
+}
+haxespec.FuryTestCase.prototype.__class__ = haxespec.FuryTestCase;
+if(typeof buildingblocksspec=='undefined') buildingblocksspec = {}
+buildingblocksspec.TextSpec = function(p) {
+	if( p === $_ ) return;
+	haxespec.FuryTestCase.call(this);
+}
+buildingblocksspec.TextSpec.__name__ = ["buildingblocksspec","TextSpec"];
+buildingblocksspec.TextSpec.__super__ = haxespec.FuryTestCase;
+for(var k in haxespec.FuryTestCase.prototype ) buildingblocksspec.TextSpec.prototype[k] = haxespec.FuryTestCase.prototype[k];
+buildingblocksspec.TextSpec.prototype.texts = null;
+buildingblocksspec.TextSpec.prototype.setup = function() {
+	this.texts = [];
+	var _g = 0;
+	while(_g < 10) {
+		var k = _g++;
+		var text = specfactory.BuildingBlocksFactory.Text();
+		this.texts.push(text);
+	}
+}
+buildingblocksspec.TextSpec.prototype.testSetup = function() {
+	var _g1 = 0, _g = this.texts.length;
+	while(_g1 < _g) {
+		var k = _g1++;
+		this.assertIncludes(buildingblocks.Canvas.Texts,this.texts[k]);
+	}
+}
+buildingblocksspec.TextSpec.prototype.__class__ = buildingblocksspec.TextSpec;
 StringTools = function() { }
 StringTools.__name__ = ["StringTools"];
 StringTools.urlEncode = function(s) {
@@ -206,7 +298,6 @@ StringTools.isEOF = function(c) {
 	return c != c;
 }
 StringTools.prototype.__class__ = StringTools;
-if(!haxe.unit) haxe.unit = {}
 haxe.unit.TestResult = function(p) {
 	if( p === $_ ) return;
 	this.m_tests = new List();
@@ -361,49 +452,6 @@ haxe.Log.clear = function() {
 	js.Boot.__clear_trace();
 }
 haxe.Log.prototype.__class__ = haxe.Log;
-haxe.Public = function() { }
-haxe.Public.__name__ = ["haxe","Public"];
-haxe.Public.prototype.__class__ = haxe.Public;
-haxe.unit.TestCase = function(p) {
-}
-haxe.unit.TestCase.__name__ = ["haxe","unit","TestCase"];
-haxe.unit.TestCase.prototype.currentTest = null;
-haxe.unit.TestCase.prototype.setup = function() {
-}
-haxe.unit.TestCase.prototype.tearDown = function() {
-}
-haxe.unit.TestCase.prototype.print = function(v) {
-	haxe.unit.TestRunner.print(v);
-}
-haxe.unit.TestCase.prototype.assertTrue = function(b,c) {
-	this.currentTest.done = true;
-	if(b == false) {
-		this.currentTest.success = false;
-		this.currentTest.error = "expected true but was false";
-		this.currentTest.posInfos = c;
-		throw this.currentTest;
-	}
-}
-haxe.unit.TestCase.prototype.assertFalse = function(b,c) {
-	this.currentTest.done = true;
-	if(b == true) {
-		this.currentTest.success = false;
-		this.currentTest.error = "expected false but was true";
-		this.currentTest.posInfos = c;
-		throw this.currentTest;
-	}
-}
-haxe.unit.TestCase.prototype.assertEquals = function(expected,actual,c) {
-	this.currentTest.done = true;
-	if(actual != expected) {
-		this.currentTest.success = false;
-		this.currentTest.error = "expected '" + expected + "' but was '" + actual + "'";
-		this.currentTest.posInfos = c;
-		throw this.currentTest;
-	}
-}
-haxe.unit.TestCase.prototype.__class__ = haxe.unit.TestCase;
-haxe.unit.TestCase.__interfaces__ = [haxe.Public];
 StringBuf = function(p) {
 	if( p === $_ ) return;
 	this.b = new Array();
@@ -423,7 +471,6 @@ StringBuf.prototype.toString = function() {
 }
 StringBuf.prototype.b = null;
 StringBuf.prototype.__class__ = StringBuf;
-if(typeof buildingblocksspec=='undefined') buildingblocksspec = {}
 buildingblocksspec.ImageSpec = function(p) {
 	if( p === $_ ) return;
 	haxe.unit.TestCase.call(this);
@@ -482,6 +529,23 @@ tools.Random.Text = function(len) {
 	}
 	return Lambda.map(rand_arr,function(n) {
 		return alphabet[n];
+	}).join("");
+}
+tools.Random.Percent = function() {
+	return tools.Random.Number(100) / 100;
+}
+tools.Random.Hex = function(len) {
+	var l = 6;
+	if(len != null) l = len;
+	var hex = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"];
+	var rand_arr = [];
+	var _g = 0;
+	while(_g < l) {
+		var k = _g++;
+		rand_arr.push(tools.Random.Number(hex.length));
+	}
+	return "#" + Lambda.map(rand_arr,function(n) {
+		return hex[n];
 	}).join("");
 }
 tools.Random.prototype.__class__ = tools.Random;
@@ -673,8 +737,8 @@ buildingblocksspec.CanvasSpec.__name__ = ["buildingblocksspec","CanvasSpec"];
 buildingblocksspec.CanvasSpec.__super__ = haxe.unit.TestCase;
 for(var k in haxe.unit.TestCase.prototype ) buildingblocksspec.CanvasSpec.prototype[k] = haxe.unit.TestCase.prototype[k];
 buildingblocksspec.CanvasSpec.prototype.testStatics = function() {
-	this.assertTrue(buildingblocks.Canvas.Self != null,{ fileName : "CanvasSpec.hx", lineNumber : 9, className : "buildingblocksspec.CanvasSpec", methodName : "testStatics"});
-	this.assertTrue(buildingblocks.Canvas.Context != null,{ fileName : "CanvasSpec.hx", lineNumber : 10, className : "buildingblocksspec.CanvasSpec", methodName : "testStatics"});
+	this.assertTrue(buildingblocks.Canvas.Self != null,{ fileName : "CanvasSpec.hx", lineNumber : 10, className : "buildingblocksspec.CanvasSpec", methodName : "testStatics"});
+	this.assertTrue(buildingblocks.Canvas.Context != null,{ fileName : "CanvasSpec.hx", lineNumber : 11, className : "buildingblocksspec.CanvasSpec", methodName : "testStatics"});
 }
 buildingblocksspec.CanvasSpec.prototype.faggotDraw = function() {
 	buildingblocks.Canvas.Configuration = { reference_width : 2560.0, reference_height : 1600.0, width : 800.0, height : 600.0};
@@ -682,6 +746,7 @@ buildingblocksspec.CanvasSpec.prototype.faggotDraw = function() {
 	while(_g < 10) {
 		var k = _g++;
 		buildingblocks.Canvas.RegisterImage(specfactory.BuildingBlocksFactory.Image());
+		buildingblocks.Canvas.RegisterText(specfactory.BuildingBlocksFactory.Text());
 	}
 }
 buildingblocksspec.CanvasSpec.prototype.testDraw = function() {
@@ -690,11 +755,11 @@ buildingblocksspec.CanvasSpec.prototype.testDraw = function() {
 	while(_g < _g1.length) {
 		var image = _g1[_g];
 		++_g;
-		this.assertTrue(image.Source().style.display == "none",{ fileName : "CanvasSpec.hx", lineNumber : 28, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
+		this.assertTrue(image.Source().style.display == "none",{ fileName : "CanvasSpec.hx", lineNumber : 30, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
 	}
-	this.assertFalse(js.Lib.document.getElementById("f242444g1524g134g1e4r1g4dfgfaggot") != null,{ fileName : "CanvasSpec.hx", lineNumber : 30, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
-	this.assertTrue(buildingblocks.Canvas.Context.drawImage != null,{ fileName : "CanvasSpec.hx", lineNumber : 31, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
-	this.assertTrue(buildingblocks.Canvas.Draw() == null,{ fileName : "CanvasSpec.hx", lineNumber : 32, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
+	this.assertFalse(js.Lib.document.getElementById("f242444g1524g134g1e4r1g4dfgfaggot") != null,{ fileName : "CanvasSpec.hx", lineNumber : 32, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
+	this.assertTrue(buildingblocks.Canvas.Context.drawImage != null,{ fileName : "CanvasSpec.hx", lineNumber : 33, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
+	this.assertTrue(buildingblocks.Canvas.Draw() == null,{ fileName : "CanvasSpec.hx", lineNumber : 34, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
 }
 buildingblocksspec.CanvasSpec.prototype.__class__ = buildingblocksspec.CanvasSpec;
 List = function(p) {
@@ -1268,6 +1333,15 @@ specfactory.BuildingBlocksFactory.ImageData = function() {
 specfactory.BuildingBlocksFactory.Image = function() {
 	return new buildingblocks.Image(specfactory.BuildingBlocksFactory.ImageData());
 }
+specfactory.BuildingBlocksFactory.TextData = function() {
+	var color = "rgb(" + tools.Random.Number(256) + "," + tools.Random.Number(256) + "," + tools.Random.Number(256) + ")";
+	var outline = "rgb(" + tools.Random.Number(256) + "," + tools.Random.Number(256) + "," + tools.Random.Number(256) + ")";
+	var font = tools.Random.Number(100) + "px " + ["Arial","sans-serif","Times New Roman"][tools.Random.Number(3)];
+	return { raw_text : tools.Random.Text(25), text_font : font, text_color : color, outline_color : outline, align : ["start","end","left","right","center"][tools.Random.Number(5)], baseline : ["alphabetic","bottom","hanging","ideographic","middle","top"][tools.Random.Number(6)], position : { x : tools.Random.Number(100) + 0.0, y : tools.Random.Number(100) + 0.0}, angle : tools.Random.Number(360) / 180 * Math.PI, opacity : 1.0};
+}
+specfactory.BuildingBlocksFactory.Text = function() {
+	return new buildingblocks.Text(specfactory.BuildingBlocksFactory.TextData());
+}
 specfactory.BuildingBlocksFactory.prototype.__class__ = specfactory.BuildingBlocksFactory;
 if(typeof furytest=='undefined') furytest = {}
 furytest.BuildingBlocksTest = function() { }
@@ -1278,6 +1352,7 @@ furytest.BuildingBlocksTest.main = function() {
 		runner.add(new buildingblocksspec.CanvasSpec());
 		runner.add(new buildingblocksspec.ElementSpec());
 		runner.add(new buildingblocksspec.ImageSpec());
+		runner.add(new buildingblocksspec.TextSpec());
 		runner.run();
 	});
 }
@@ -1289,10 +1364,16 @@ buildingblocks.Canvas.RegisterImage = function(img) {
 	buildingblocks.Canvas.Images.push(img);
 	return index;
 }
+buildingblocks.Canvas.RegisterText = function(txt) {
+	var index = buildingblocks.Canvas.Texts.length;
+	buildingblocks.Canvas.Texts.push(txt);
+	return index;
+}
 buildingblocks.Canvas.Draw = function() {
 	buildingblocks.Canvas.Self.setAttribute("width",buildingblocks.Canvas.Configuration.width + "px");
 	buildingblocks.Canvas.Self.setAttribute("height",buildingblocks.Canvas.Configuration.height + "px");
 	buildingblocks.Canvas.Self.style.border = "2px solid black";
+	buildingblocks.Canvas.Context.clearRect(0,0,buildingblocks.Canvas.Configuration.width,buildingblocks.Canvas.Configuration.height);
 	var ratio = buildingblocks.Canvas.Configuration.reference_width / buildingblocks.Canvas.Configuration.reference_height;
 	var width = buildingblocks.Canvas.Configuration.width;
 	var height = width / ratio;
@@ -1309,6 +1390,22 @@ buildingblocks.Canvas.Draw = function() {
 		var skew = { cos : Math.cos(image.Jsonify().angle), sin : Math.sin(image.Jsonify().angle)};
 		buildingblocks.Canvas.Context.setTransform(skew.cos,skew.sin,-skew.sin,skew.cos,0,0);
 		buildingblocks.Canvas.Context.drawImage(image.Source(),source_position.x,source_position.y,source_size.width,source_size.height,position.x * width / 100,position.y * height / 100 + band_height,size.width * width / 100,size.height * height / 100);
+	}
+	var _g = 0, _g1 = buildingblocks.Canvas.Texts;
+	while(_g < _g1.length) {
+		var text = _g1[_g];
+		++_g;
+		var a = { cos : Math.cos(text.Jsonify().angle), sin : Math.sin(text.Jsonify().angle)};
+		buildingblocks.Canvas.Context.setTransform(a.cos,a.sin,-a.sin,a.cos,0,0);
+		buildingblocks.Canvas.Context.textAlign = text.Jsonify().align;
+		buildingblocks.Canvas.Context.textBaseline = text.Jsonify().baseline;
+		buildingblocks.Canvas.Context.fillStyle = text.Jsonify().text_color;
+		buildingblocks.Canvas.Context.strokeStyle = text.Jsonify().outline_color;
+		buildingblocks.Canvas.Context.font = text.Jsonify().text_font;
+		var p = text.Jsonify().position;
+		var t = text.Jsonify().raw_text;
+		buildingblocks.Canvas.Context.fillText(t,p.x * width / 100,p.y * height / 100 + band_height);
+		buildingblocks.Canvas.Context.strokeText(t,p.x * width / 100,p.y * height / 100 + band_height);
 	}
 	buildingblocks.Canvas.Context.setTransform(1,0,0,1,0,0);
 	buildingblocks.Canvas.Context.fillStyle = "black";
@@ -1330,6 +1427,20 @@ haxe.unit.TestStatus.prototype.classname = null;
 haxe.unit.TestStatus.prototype.posInfos = null;
 haxe.unit.TestStatus.prototype.backtrace = null;
 haxe.unit.TestStatus.prototype.__class__ = haxe.unit.TestStatus;
+buildingblocks.Text = function(data) {
+	if( data === $_ ) return;
+	buildingblocks.Element.call(this);
+	this.text_data = data;
+	buildingblocks.Canvas.RegisterText(this);
+}
+buildingblocks.Text.__name__ = ["buildingblocks","Text"];
+buildingblocks.Text.__super__ = buildingblocks.Element;
+for(var k in buildingblocks.Element.prototype ) buildingblocks.Text.prototype[k] = buildingblocks.Element.prototype[k];
+buildingblocks.Text.prototype.text_data = null;
+buildingblocks.Text.prototype.Jsonify = function() {
+	return this.text_data;
+}
+buildingblocks.Text.prototype.__class__ = buildingblocks.Text;
 $_ = {}
 js.Boot.__res = {}
 js.Boot.__init();
@@ -1409,6 +1520,7 @@ buildingblocks.Element.Parent = (function() {
 })();
 js.Lib.onerror = null;
 buildingblocks.Canvas.Images = [];
+buildingblocks.Canvas.Texts = [];
 buildingblocks.Canvas.Configuration = { reference_width : 2560.0, reference_height : 1600.0, width : 800.0, height : 600.0};
 buildingblocks.Canvas.Self = (function() {
 	var body = new js.JQuery("body");
@@ -1417,7 +1529,7 @@ buildingblocks.Canvas.Self = (function() {
 })();
 buildingblocks.Canvas.Context = (function() {
 	if(buildingblocks.Canvas.Self == null) {
-		haxe.Log.trace("You need to place this code AFTER the <canvas> tag in body in order for this to work!",{ fileName : "Canvas.hx", lineNumber : 24, className : "buildingblocks.Canvas"});
+		haxe.Log.trace("You need to place this code AFTER the <canvas> tag in body in order for this to work!",{ fileName : "Canvas.hx", lineNumber : 27, className : "buildingblocks.Canvas"});
 		throw "Javascript Location Error : try placing the <javascript> AFTER the <canvas> tag";
 		return;
 	}

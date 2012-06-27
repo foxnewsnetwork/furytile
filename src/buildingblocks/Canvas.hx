@@ -2,10 +2,13 @@ package buildingblocks;
 import js.JQuery;
 import buildingblocks.Image;
 import buildingblocksdata.CanvasData;
+import buildingblocks.Text;
+import buildingblocksdata.TextData;
 
 // Static canvas class
 class Canvas {
 	public static var Images : Array<Image> = [];
+	public static var Texts : Array<Text> = [];
 	public static var Configuration : CanvasData = { 
 		reference_width : 2560.0 ,
 		reference_height : 1600.0 ,
@@ -33,17 +36,24 @@ class Canvas {
 		Canvas.Images.push(img);
 		return index;
 	} // RegisterImage
+	public static function RegisterText( txt : Text ) : Int { 
+		var index = Canvas.Texts.length;
+		Canvas.Texts.push(txt);
+		return index;
+	} // RegisterText
+	// Draw redraws the ENTIRE canvas
 	public static function Draw() { 
 		Canvas.Self.setAttribute("width", Canvas.Configuration.width + "px");
 		Canvas.Self.setAttribute("height", Canvas.Configuration.height + "px");
 		Canvas.Self.style.border = "2px solid black";
+		Canvas.Context.clearRect(0,0, Canvas.Configuration.width, Canvas.Configuration.height);
+		
 		// Step 1: Calculate the maximum draw box that will fit in the given resolution
 		var ratio = Canvas.Configuration.reference_width / Canvas.Configuration.reference_height;
 		var width = Canvas.Configuration.width;
 		var height = width / ratio;
 		var k_y = height / Canvas.Configuration.height;
 		var band_height = ( Canvas.Configuration.height - height ) / 2;
-		
 		
 		// Step 2: Draw the images
 		for( image in Canvas.Images ) { 
@@ -56,7 +66,29 @@ class Canvas {
 			Canvas.Context.drawImage(image.Source(), source_position.x, source_position.y, source_size.width, source_size.height, position.x * width / 100, position.y * height / 100 + band_height, size.width * width / 100, size.height * height / 100); // drawImage
 		} // for image
 		
-		// Step 3: Draw black bands in filler areas
+		// Step 3: Draw the texts
+		for( text in Canvas.Texts ) { 
+			// Step a: setting the rotational matrix
+			var a = { cos : Math.cos(text.Jsonify().angle), sin : Math.sin(text.Jsonify().angle) };
+			Canvas.Context.setTransform( a.cos, a.sin, -a.sin, a.cos, 0, 0);
+			
+			// Step b: setting the alignment
+			Canvas.Context.textAlign = text.Jsonify().align;
+			Canvas.Context.textBaseline = text.Jsonify().baseline;
+			
+			// Step c: Setting color
+			Canvas.Context.fillStyle = text.Jsonify().text_color;
+			Canvas.Context.strokeStyle = text.Jsonify().outline_color;
+			Canvas.Context.font = text.Jsonify().text_font;
+			
+			// Step d: writing text
+			var p = text.Jsonify().position;
+			var t = text.Jsonify().raw_text;
+			Canvas.Context.fillText(t, p.x * width / 100, p.y * height / 100 + band_height);
+			Canvas.Context.strokeText(t, p.x * width / 100, p.y * height / 100 + band_height);
+		} // for text
+		
+		// Step Last: Draw black bands in filler areas
 		Canvas.Context.setTransform(1,0,0,1,0,0); // Clears transforms
 		Canvas.Context.fillStyle = "black";
 		Canvas.Context.fillRect(0,0,width,band_height);

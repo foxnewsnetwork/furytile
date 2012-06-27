@@ -2,6 +2,7 @@ package furytest;
 import buildingblocksspec.CanvasSpec;
 import buildingblocksspec.ElementSpec;
 import buildingblocksspec.ImageSpec;
+import buildingblocksspec.TextSpec;
 import js.JQuery;
 
 class BuildingBlocksTest {
@@ -11,6 +12,7 @@ class BuildingBlocksTest {
 			runner.add(new CanvasSpec());
 			runner.add(new ElementSpec());
 			runner.add(new ImageSpec() );
+			runner.add(new TextSpec() );
 			runner.run();
 		} ); // document ready
 	} // main

@@ -24,4 +24,20 @@ class Random {
 			rand_arr.push( Random.Number(alphabet.length) );
 		return Lambda.map(rand_arr, function(n) { return alphabet[n]; } ).join("");
 	} // Text
+	
+	public static function Percent() : Float { 
+		return Random.Number(100) / 100;
+	} // Percent 
+	
+	public static function Hex( ?len : Int ) : String { 
+		var l = 6;
+		if ( len != null )
+			l = len;
+		var hex = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'];
+		var rand_arr = [];
+		for( k in 0...l ) { 
+			rand_arr.push( Random.Number(hex.length) );
+		} // for k
+		return "#" + Lambda.map(rand_arr, function(n) { return hex[n]; } ).join("");
+	} // Hex
 } // Random

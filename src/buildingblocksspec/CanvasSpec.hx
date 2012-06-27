@@ -1,6 +1,7 @@
 package buildingblocksspec;
 import buildingblocks.Canvas;
 import buildingblocks.Image;
+import buildingblocks.Text;
 import specfactory.BuildingBlocksFactory;
 
 class CanvasSpec extends haxe.unit.TestCase {
@@ -19,6 +20,7 @@ class CanvasSpec extends haxe.unit.TestCase {
 		}; // Configuration
 		for( k in 0...10 ) { 
 			Canvas.RegisterImage(BuildingBlocksFactory.Image());
+			Canvas.RegisterText(BuildingBlocksFactory.Text());
 		} // for
 	} // setupDraw
 	
