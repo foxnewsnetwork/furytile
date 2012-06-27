@@ -1,10 +1,11 @@
 package buildingblocks;
 import buildingblocksdata.ImageData;
 import js.JQuery;
+import js.Dom.HtmlDom;
 
 class Image extends Element {
 	// on source
-	private var source : JQuery;
+	private var source : HtmlDom;
 	private var image_data : ImageData;
 	
 	// status
@@ -19,11 +20,16 @@ class Image extends Element {
 		source_txt += "src='" + data.source + "' ";
 		source_txt += "id='furytile-image-preload-" + this.Id() + "' ";
 		source_txt += "style='display : none; position : absolute;'/>";
-		this.source = Element.Parent.append(source_txt); 
+		Element.Parent.append(source_txt);
+		this.source = js.Lib.document.getElementById("furytile-image-preload-" + this.Id()); 
 		this.index = Canvas.RegisterImage( this );
 	} // new
 	
 	public function Jsonify() { 
 		return image_data;
 	} // Serialize	
+	
+	public function Source() { 
+		return this.source;
+	} // Source
 } // Image

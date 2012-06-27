@@ -102,7 +102,8 @@ buildingblocks.Image = function(data) {
 	source_txt += "src='" + data.source + "' ";
 	source_txt += "id='furytile-image-preload-" + this.Id() + "' ";
 	source_txt += "style='display : none; position : absolute;'/>";
-	this.source = buildingblocks.Element.Parent.append(source_txt);
+	buildingblocks.Element.Parent.append(source_txt);
+	this.source = js.Lib.document.getElementById("furytile-image-preload-" + this.Id());
 	this.index = buildingblocks.Canvas.RegisterImage(this);
 }
 buildingblocks.Image.__name__ = ["buildingblocks","Image"];
@@ -113,6 +114,9 @@ buildingblocks.Image.prototype.image_data = null;
 buildingblocks.Image.prototype.index = null;
 buildingblocks.Image.prototype.Jsonify = function() {
 	return this.image_data;
+}
+buildingblocks.Image.prototype.Source = function() {
+	return this.source;
 }
 buildingblocks.Image.prototype.__class__ = buildingblocks.Image;
 StringTools = function() { }
@@ -430,30 +434,29 @@ for(var k in haxe.unit.TestCase.prototype ) buildingblocksspec.ImageSpec.prototy
 buildingblocksspec.ImageSpec.prototype.image = null;
 buildingblocksspec.ImageSpec.prototype.setup = function() {
 	haxe.unit.TestCase.prototype.setup.call(this);
-	this.image = new buildingblocks.Image(this.generateImageData());
-}
-buildingblocksspec.ImageSpec.prototype.generateImageData = function() {
-	var data = { source : "madotsuki.png", source_position : { x : 0.0, y : 0.0}, source_size : { width : 60.0, height : 60.0}, position : { x : tools.Random.Number(256) + 0.0, y : tools.Random.Number(256) + 0.0}, size : { width : tools.Random.Number(256) + 0.0, height : tools.Random.Number(256) + 0.0}, skew : { x : tools.Random.Decimal(), y : tools.Random.Decimal()}, opacity : 1.0};
-	return data;
+	this.image = specfactory.BuildingBlocksFactory.Image();
 }
 buildingblocksspec.ImageSpec.prototype.testSetup = function() {
-	this.assertEquals(buildingblocks.Element.Count - 1,this.image.Id(),{ fileName : "ImageSpec.hx", lineNumber : 30, className : "buildingblocksspec.ImageSpec", methodName : "testSetup"});
+	this.assertEquals(buildingblocks.Element.Count - 1,this.image.Id(),{ fileName : "ImageSpec.hx", lineNumber : 18, className : "buildingblocksspec.ImageSpec", methodName : "testSetup"});
 }
 buildingblocksspec.ImageSpec.prototype.testCanvasRegistration = function() {
 	var indicies = [];
 	var images = [];
 	var _g = 0;
-	while(_g < 50) {
+	while(_g < 10) {
 		var k = _g++;
-		var img = new buildingblocks.Image(this.generateImageData());
+		var img = specfactory.BuildingBlocksFactory.Image();
 		indicies.push(buildingblocks.Canvas.RegisterImage(img));
 		images.push(img);
 	}
 	var _g = 0;
-	while(_g < 50) {
+	while(_g < 10) {
 		var k = _g++;
-		this.assertEquals(buildingblocks.Canvas.Images[indicies[k]].Jsonify(),images[k].Jsonify(),{ fileName : "ImageSpec.hx", lineNumber : 44, className : "buildingblocksspec.ImageSpec", methodName : "testCanvasRegistration"});
+		this.assertEquals(buildingblocks.Canvas.Images[indicies[k]].Jsonify(),images[k].Jsonify(),{ fileName : "ImageSpec.hx", lineNumber : 32, className : "buildingblocksspec.ImageSpec", methodName : "testCanvasRegistration"});
 	}
+}
+buildingblocksspec.ImageSpec.prototype.tearDown = function() {
+	return;
 }
 buildingblocksspec.ImageSpec.prototype.__class__ = buildingblocksspec.ImageSpec;
 if(typeof tools=='undefined') tools = {}
@@ -670,8 +673,28 @@ buildingblocksspec.CanvasSpec.__name__ = ["buildingblocksspec","CanvasSpec"];
 buildingblocksspec.CanvasSpec.__super__ = haxe.unit.TestCase;
 for(var k in haxe.unit.TestCase.prototype ) buildingblocksspec.CanvasSpec.prototype[k] = haxe.unit.TestCase.prototype[k];
 buildingblocksspec.CanvasSpec.prototype.testStatics = function() {
-	this.assertTrue(buildingblocks.Canvas.Self != null,{ fileName : "CanvasSpec.hx", lineNumber : 7, className : "buildingblocksspec.CanvasSpec", methodName : "testStatics"});
-	this.assertTrue(buildingblocks.Canvas.Context != null,{ fileName : "CanvasSpec.hx", lineNumber : 8, className : "buildingblocksspec.CanvasSpec", methodName : "testStatics"});
+	this.assertTrue(buildingblocks.Canvas.Self != null,{ fileName : "CanvasSpec.hx", lineNumber : 9, className : "buildingblocksspec.CanvasSpec", methodName : "testStatics"});
+	this.assertTrue(buildingblocks.Canvas.Context != null,{ fileName : "CanvasSpec.hx", lineNumber : 10, className : "buildingblocksspec.CanvasSpec", methodName : "testStatics"});
+}
+buildingblocksspec.CanvasSpec.prototype.faggotDraw = function() {
+	buildingblocks.Canvas.Configuration = { reference_width : 2560.0, reference_height : 1600.0, width : 800.0, height : 600.0};
+	var _g = 0;
+	while(_g < 10) {
+		var k = _g++;
+		buildingblocks.Canvas.RegisterImage(specfactory.BuildingBlocksFactory.Image());
+	}
+}
+buildingblocksspec.CanvasSpec.prototype.testDraw = function() {
+	this.faggotDraw();
+	var _g = 0, _g1 = buildingblocks.Canvas.Images;
+	while(_g < _g1.length) {
+		var image = _g1[_g];
+		++_g;
+		this.assertTrue(image.Source().style.display == "none",{ fileName : "CanvasSpec.hx", lineNumber : 28, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
+	}
+	this.assertFalse(js.Lib.document.getElementById("f242444g1524g134g1e4r1g4dfgfaggot") != null,{ fileName : "CanvasSpec.hx", lineNumber : 30, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
+	this.assertTrue(buildingblocks.Canvas.Context.drawImage != null,{ fileName : "CanvasSpec.hx", lineNumber : 31, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
+	this.assertTrue(buildingblocks.Canvas.Draw() == null,{ fileName : "CanvasSpec.hx", lineNumber : 32, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
 }
 buildingblocksspec.CanvasSpec.prototype.__class__ = buildingblocksspec.CanvasSpec;
 List = function(p) {
@@ -1233,15 +1256,30 @@ js.Boot.__init = function() {
 	$closure = js.Boot.__closure;
 }
 js.Boot.prototype.__class__ = js.Boot;
+if(typeof specfactory=='undefined') specfactory = {}
+specfactory.BuildingBlocksFactory = function() { }
+specfactory.BuildingBlocksFactory.__name__ = ["specfactory","BuildingBlocksFactory"];
+specfactory.BuildingBlocksFactory.CanvasData = function() {
+	return { reference_width : 2560.0, reference_height : 1600.0, width : tools.Random.Number(2560) + 0.0, height : tools.Random.Number(1600) + 0.0};
+}
+specfactory.BuildingBlocksFactory.ImageData = function() {
+	return { source : "madotsuki.png", source_position : { x : 0.0, y : 0.0}, source_size : { width : 60.0, height : 60.0}, position : { x : tools.Random.Number(100) + 0.0, y : tools.Random.Number(100) + 0.0}, size : { width : tools.Random.Number(10) + 10.0, height : tools.Random.Number(10) + 10.0}, angle : tools.Random.Number(360) / 180 * Math.PI, opacity : 1.0};
+}
+specfactory.BuildingBlocksFactory.Image = function() {
+	return new buildingblocks.Image(specfactory.BuildingBlocksFactory.ImageData());
+}
+specfactory.BuildingBlocksFactory.prototype.__class__ = specfactory.BuildingBlocksFactory;
 if(typeof furytest=='undefined') furytest = {}
 furytest.BuildingBlocksTest = function() { }
 furytest.BuildingBlocksTest.__name__ = ["furytest","BuildingBlocksTest"];
 furytest.BuildingBlocksTest.main = function() {
-	var runner = new haxe.unit.TestRunner();
-	runner.add(new buildingblocksspec.CanvasSpec());
-	runner.add(new buildingblocksspec.ElementSpec());
-	runner.add(new buildingblocksspec.ImageSpec());
-	runner.run();
+	new js.JQuery("document").ready(function(e) {
+		var runner = new haxe.unit.TestRunner();
+		runner.add(new buildingblocksspec.CanvasSpec());
+		runner.add(new buildingblocksspec.ElementSpec());
+		runner.add(new buildingblocksspec.ImageSpec());
+		runner.run();
+	});
 }
 furytest.BuildingBlocksTest.prototype.__class__ = furytest.BuildingBlocksTest;
 buildingblocks.Canvas = function() { }
@@ -1250,6 +1288,32 @@ buildingblocks.Canvas.RegisterImage = function(img) {
 	var index = buildingblocks.Canvas.Images.length;
 	buildingblocks.Canvas.Images.push(img);
 	return index;
+}
+buildingblocks.Canvas.Draw = function() {
+	buildingblocks.Canvas.Self.setAttribute("width",buildingblocks.Canvas.Configuration.width + "px");
+	buildingblocks.Canvas.Self.setAttribute("height",buildingblocks.Canvas.Configuration.height + "px");
+	buildingblocks.Canvas.Self.style.border = "2px solid black";
+	var ratio = buildingblocks.Canvas.Configuration.reference_width / buildingblocks.Canvas.Configuration.reference_height;
+	var width = buildingblocks.Canvas.Configuration.width;
+	var height = width / ratio;
+	var k_y = height / buildingblocks.Canvas.Configuration.height;
+	var band_height = (buildingblocks.Canvas.Configuration.height - height) / 2;
+	var _g = 0, _g1 = buildingblocks.Canvas.Images;
+	while(_g < _g1.length) {
+		var image = _g1[_g];
+		++_g;
+		var source_position = image.Jsonify().source_position;
+		var source_size = image.Jsonify().source_size;
+		var position = image.Jsonify().position;
+		var size = image.Jsonify().size;
+		var skew = { cos : Math.cos(image.Jsonify().angle), sin : Math.sin(image.Jsonify().angle)};
+		buildingblocks.Canvas.Context.setTransform(1,0,0,1,0,0);
+		buildingblocks.Canvas.Context.drawImage(image.Source(),source_position.x,source_position.y,source_size.width,source_size.height,position.x * width / 100,position.y * height / 100 + band_height,size.width * width / 100,size.height * height / 100);
+	}
+	buildingblocks.Canvas.Context.setTransform(1,0,0,1,0,0);
+	buildingblocks.Canvas.Context.fillStyle = "black";
+	buildingblocks.Canvas.Context.fillRect(0,0,width,band_height);
+	buildingblocks.Canvas.Context.fillRect(0,buildingblocks.Canvas.Configuration.height - band_height,width,band_height);
 }
 buildingblocks.Canvas.prototype.__class__ = buildingblocks.Canvas;
 haxe.unit.TestStatus = function(p) {
@@ -1345,6 +1409,7 @@ buildingblocks.Element.Parent = (function() {
 })();
 js.Lib.onerror = null;
 buildingblocks.Canvas.Images = [];
+buildingblocks.Canvas.Configuration = { reference_width : 2560.0, reference_height : 1600.0, width : 800.0, height : 600.0};
 buildingblocks.Canvas.Self = (function() {
 	var body = new js.JQuery("body");
 	if(body.length <= 0) body.append("<canvas id='canvas'>Something went terribly wrong</canvas>");
@@ -1352,7 +1417,7 @@ buildingblocks.Canvas.Self = (function() {
 })();
 buildingblocks.Canvas.Context = (function() {
 	if(buildingblocks.Canvas.Self == null) {
-		haxe.Log.trace("You need to place this code AFTER the <canvas> tag in body in order for this to work!",{ fileName : "Canvas.hx", lineNumber : 18, className : "buildingblocks.Canvas"});
+		haxe.Log.trace("You need to place this code AFTER the <canvas> tag in body in order for this to work!",{ fileName : "Canvas.hx", lineNumber : 24, className : "buildingblocks.Canvas"});
 		throw "Javascript Location Error : try placing the <javascript> AFTER the <canvas> tag";
 		return;
 	}
