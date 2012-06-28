@@ -14,9 +14,29 @@ class TextSpec extends FuryTestCase {
 		} // for
 	} // setup
 	
+	public override function tearDown () { 
+		for( text in this.texts ) { 
+			Canvas.RemoveText(text);
+		} // for
+	} // tearDown
 	public function testSetup() { 
+		
 		for( k in 0...this.texts.length ) {
-			this.assertIncludes( Canvas.Texts, this.texts[k] ); 
+			this.assertTrue(Canvas.Texts.exists(this.texts[k].Index())); 
 		} // for k
+		
+		for ( txt in Canvas.Texts ) { 
+			this.assertIncludes(this.texts, txt);
+		} // for txt
 	} // testSetup
+	
+	public function testTearDown() { 
+		for( text in this.texts ) { 
+			this.assertTrue(Canvas.Texts.exists(text.Index()));
+			var startCount = Canvas.TextCount;
+			Canvas.RemoveText(text);
+			this.assertEquals(startCount - 1, Canvas.TextCount);
+			this.assertFalse(Canvas.Texts.exists(text.Index()));
+		} // for text
+	} // tearDown
 } // TextSpec

@@ -13,6 +13,7 @@ class Element {
 	})(); // Parent
 	
 	private var id : Int;
+	private var index : String;
 	 
 	public function new() { 
 		// Step 1: Setup ID
@@ -23,4 +24,10 @@ class Element {
 	public function Id() { 
 		return this.id;
 	} // Id
+	
+	public function Index() : String { 
+		return this.index;
+	} // Index
+	public function Hide() { }
+	public function Show() { }
 } // Element

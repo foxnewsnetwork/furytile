@@ -8,8 +8,6 @@ class Image extends Element {
 	private var source : HtmlDom;
 	private var image_data : ImageData;
 	
-	// status
-	private var index : Int;
 	
 	public function new(data : ImageData) { 
 		super();
@@ -32,4 +30,18 @@ class Image extends Element {
 	public function Source() { 
 		return this.source;
 	} // Source
+	
+	public override function Hide() : Void { 
+		if ( this.index == null )
+			return;
+		Canvas.RemoveImage(this);
+		this.index = null;
+	} // Hide
+	
+	public override function Show() : Void { 
+		if ( this.index != null ) { 
+			return;
+		} // if
+		this.index = Canvas.RegisterImage(this);
+	} // Show
 } // Image

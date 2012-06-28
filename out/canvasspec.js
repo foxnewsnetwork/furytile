@@ -90,8 +90,16 @@ buildingblocks.Element = function(p) {
 }
 buildingblocks.Element.__name__ = ["buildingblocks","Element"];
 buildingblocks.Element.prototype.id = null;
+buildingblocks.Element.prototype.index = null;
 buildingblocks.Element.prototype.Id = function() {
 	return this.id;
+}
+buildingblocks.Element.prototype.Index = function() {
+	return this.index;
+}
+buildingblocks.Element.prototype.Hide = function() {
+}
+buildingblocks.Element.prototype.Show = function() {
 }
 buildingblocks.Element.prototype.__class__ = buildingblocks.Element;
 buildingblocks.Image = function(data) {
@@ -111,12 +119,20 @@ buildingblocks.Image.__super__ = buildingblocks.Element;
 for(var k in buildingblocks.Element.prototype ) buildingblocks.Image.prototype[k] = buildingblocks.Element.prototype[k];
 buildingblocks.Image.prototype.source = null;
 buildingblocks.Image.prototype.image_data = null;
-buildingblocks.Image.prototype.index = null;
 buildingblocks.Image.prototype.Jsonify = function() {
 	return this.image_data;
 }
 buildingblocks.Image.prototype.Source = function() {
 	return this.source;
+}
+buildingblocks.Image.prototype.Hide = function() {
+	if(this.index == null) return;
+	buildingblocks.Canvas.RemoveImage(this);
+	this.index = null;
+}
+buildingblocks.Image.prototype.Show = function() {
+	if(this.index != null) return;
+	this.index = buildingblocks.Canvas.RegisterImage(this);
 }
 buildingblocks.Image.prototype.__class__ = buildingblocks.Image;
 haxe.Public = function() { }
@@ -203,11 +219,36 @@ buildingblocksspec.TextSpec.prototype.setup = function() {
 		this.texts.push(text);
 	}
 }
+buildingblocksspec.TextSpec.prototype.tearDown = function() {
+	var _g = 0, _g1 = this.texts;
+	while(_g < _g1.length) {
+		var text = _g1[_g];
+		++_g;
+		buildingblocks.Canvas.RemoveText(text);
+	}
+}
 buildingblocksspec.TextSpec.prototype.testSetup = function() {
 	var _g1 = 0, _g = this.texts.length;
 	while(_g1 < _g) {
 		var k = _g1++;
-		this.assertIncludes(buildingblocks.Canvas.Texts,this.texts[k]);
+		this.assertTrue(buildingblocks.Canvas.Texts.exists(this.texts[k].Index()),{ fileName : "TextSpec.hx", lineNumber : 25, className : "buildingblocksspec.TextSpec", methodName : "testSetup"});
+	}
+	var $it0 = buildingblocks.Canvas.Texts.iterator();
+	while( $it0.hasNext() ) {
+		var txt = $it0.next();
+		this.assertIncludes(this.texts,txt);
+	}
+}
+buildingblocksspec.TextSpec.prototype.testTearDown = function() {
+	var _g = 0, _g1 = this.texts;
+	while(_g < _g1.length) {
+		var text = _g1[_g];
+		++_g;
+		this.assertTrue(buildingblocks.Canvas.Texts.exists(text.Index()),{ fileName : "TextSpec.hx", lineNumber : 35, className : "buildingblocksspec.TextSpec", methodName : "testTearDown"});
+		var startCount = buildingblocks.Canvas.TextCount;
+		buildingblocks.Canvas.RemoveText(text);
+		this.assertEquals(startCount - 1,buildingblocks.Canvas.TextCount,{ fileName : "TextSpec.hx", lineNumber : 38, className : "buildingblocksspec.TextSpec", methodName : "testTearDown"});
+		this.assertFalse(buildingblocks.Canvas.Texts.exists(text.Index()),{ fileName : "TextSpec.hx", lineNumber : 39, className : "buildingblocksspec.TextSpec", methodName : "testTearDown"});
 	}
 }
 buildingblocksspec.TextSpec.prototype.__class__ = buildingblocksspec.TextSpec;
@@ -473,37 +514,73 @@ StringBuf.prototype.b = null;
 StringBuf.prototype.__class__ = StringBuf;
 buildingblocksspec.ImageSpec = function(p) {
 	if( p === $_ ) return;
-	haxe.unit.TestCase.call(this);
+	haxespec.FuryTestCase.call(this);
 }
 buildingblocksspec.ImageSpec.__name__ = ["buildingblocksspec","ImageSpec"];
-buildingblocksspec.ImageSpec.__super__ = haxe.unit.TestCase;
-for(var k in haxe.unit.TestCase.prototype ) buildingblocksspec.ImageSpec.prototype[k] = haxe.unit.TestCase.prototype[k];
-buildingblocksspec.ImageSpec.prototype.image = null;
+buildingblocksspec.ImageSpec.__super__ = haxespec.FuryTestCase;
+for(var k in haxespec.FuryTestCase.prototype ) buildingblocksspec.ImageSpec.prototype[k] = haxespec.FuryTestCase.prototype[k];
+buildingblocksspec.ImageSpec.prototype.images = null;
+buildingblocksspec.ImageSpec.prototype.indicies = null;
 buildingblocksspec.ImageSpec.prototype.setup = function() {
-	haxe.unit.TestCase.prototype.setup.call(this);
-	this.image = specfactory.BuildingBlocksFactory.Image();
-}
-buildingblocksspec.ImageSpec.prototype.testSetup = function() {
-	this.assertEquals(buildingblocks.Element.Count - 1,this.image.Id(),{ fileName : "ImageSpec.hx", lineNumber : 18, className : "buildingblocksspec.ImageSpec", methodName : "testSetup"});
-}
-buildingblocksspec.ImageSpec.prototype.testCanvasRegistration = function() {
-	var indicies = [];
-	var images = [];
+	haxespec.FuryTestCase.prototype.setup.call(this);
+	this.images = [];
+	this.indicies = [];
 	var _g = 0;
 	while(_g < 10) {
 		var k = _g++;
 		var img = specfactory.BuildingBlocksFactory.Image();
-		indicies.push(buildingblocks.Canvas.RegisterImage(img));
-		images.push(img);
-	}
-	var _g = 0;
-	while(_g < 10) {
-		var k = _g++;
-		this.assertEquals(buildingblocks.Canvas.Images[indicies[k]].Jsonify(),images[k].Jsonify(),{ fileName : "ImageSpec.hx", lineNumber : 32, className : "buildingblocksspec.ImageSpec", methodName : "testCanvasRegistration"});
+		this.indicies.push(buildingblocks.Canvas.RegisterImage(img));
+		this.images.push(img);
 	}
 }
 buildingblocksspec.ImageSpec.prototype.tearDown = function() {
-	return;
+	var _g = 0, _g1 = this.images;
+	while(_g < _g1.length) {
+		var image = _g1[_g];
+		++_g;
+		buildingblocks.Canvas.RemoveImage(image);
+	}
+}
+buildingblocksspec.ImageSpec.prototype.testExclusivity = function() {
+	var _g = 0, _g1 = this.images;
+	while(_g < _g1.length) {
+		var image = _g1[_g];
+		++_g;
+		this.assertTrue(buildingblocks.Canvas.Images.exists(image.Index()),{ fileName : "ImageSpec.hx", lineNumber : 32, className : "buildingblocksspec.ImageSpec", methodName : "testExclusivity"});
+	}
+	var $it0 = buildingblocks.Canvas.Images.iterator();
+	while( $it0.hasNext() ) {
+		var image = $it0.next();
+		this.assertIncludes(this.images,image);
+	}
+}
+buildingblocksspec.ImageSpec.prototype.testSetup = function() {
+	var _g = 0, _g1 = this.images;
+	while(_g < _g1.length) {
+		var img = _g1[_g];
+		++_g;
+		if(!buildingblocks.Canvas.Images.exists(img.Index())) haxe.Log.trace(img.Index(),{ fileName : "ImageSpec.hx", lineNumber : 42, className : "buildingblocksspec.ImageSpec", methodName : "testSetup"});
+		this.assertTrue(buildingblocks.Canvas.Images.exists(img.Index()),{ fileName : "ImageSpec.hx", lineNumber : 43, className : "buildingblocksspec.ImageSpec", methodName : "testSetup"});
+	}
+}
+buildingblocksspec.ImageSpec.prototype.testCanvasRegistration = function() {
+	var _g = 0;
+	while(_g < 10) {
+		var k = _g++;
+		this.assertEquals(buildingblocks.Canvas.Images.get(this.indicies[k]).Jsonify(),this.images[k].Jsonify(),{ fileName : "ImageSpec.hx", lineNumber : 50, className : "buildingblocksspec.ImageSpec", methodName : "testCanvasRegistration"});
+	}
+}
+buildingblocksspec.ImageSpec.prototype.testTearDown = function() {
+	var _g = 0, _g1 = this.images;
+	while(_g < _g1.length) {
+		var image = _g1[_g];
+		++_g;
+		this.assertTrue(buildingblocks.Canvas.Images.exists(image.Index()),{ fileName : "ImageSpec.hx", lineNumber : 57, className : "buildingblocksspec.ImageSpec", methodName : "testTearDown"});
+		var startCount = buildingblocks.Canvas.ImageCount;
+		buildingblocks.Canvas.RemoveImage(image);
+		this.assertEquals(startCount - 1,buildingblocks.Canvas.ImageCount,{ fileName : "ImageSpec.hx", lineNumber : 60, className : "buildingblocksspec.ImageSpec", methodName : "testTearDown"});
+		this.assertFalse(buildingblocks.Canvas.Images.exists(image.Index()),{ fileName : "ImageSpec.hx", lineNumber : 61, className : "buildingblocksspec.ImageSpec", methodName : "testTearDown"});
+	}
 }
 buildingblocksspec.ImageSpec.prototype.__class__ = buildingblocksspec.ImageSpec;
 if(typeof tools=='undefined') tools = {}
@@ -736,30 +813,46 @@ buildingblocksspec.CanvasSpec = function(p) {
 buildingblocksspec.CanvasSpec.__name__ = ["buildingblocksspec","CanvasSpec"];
 buildingblocksspec.CanvasSpec.__super__ = haxe.unit.TestCase;
 for(var k in haxe.unit.TestCase.prototype ) buildingblocksspec.CanvasSpec.prototype[k] = haxe.unit.TestCase.prototype[k];
-buildingblocksspec.CanvasSpec.prototype.testStatics = function() {
-	this.assertTrue(buildingblocks.Canvas.Self != null,{ fileName : "CanvasSpec.hx", lineNumber : 10, className : "buildingblocksspec.CanvasSpec", methodName : "testStatics"});
-	this.assertTrue(buildingblocks.Canvas.Context != null,{ fileName : "CanvasSpec.hx", lineNumber : 11, className : "buildingblocksspec.CanvasSpec", methodName : "testStatics"});
-}
-buildingblocksspec.CanvasSpec.prototype.faggotDraw = function() {
+buildingblocksspec.CanvasSpec.prototype.images = null;
+buildingblocksspec.CanvasSpec.prototype.texts = null;
+buildingblocksspec.CanvasSpec.prototype.setup = function() {
+	this.images = [];
+	this.texts = [];
 	buildingblocks.Canvas.Configuration = { reference_width : 2560.0, reference_height : 1600.0, width : 800.0, height : 600.0};
 	var _g = 0;
 	while(_g < 10) {
 		var k = _g++;
-		buildingblocks.Canvas.RegisterImage(specfactory.BuildingBlocksFactory.Image());
-		buildingblocks.Canvas.RegisterText(specfactory.BuildingBlocksFactory.Text());
+		this.images.push(specfactory.BuildingBlocksFactory.Image());
+		this.texts.push(specfactory.BuildingBlocksFactory.Text());
 	}
 }
-buildingblocksspec.CanvasSpec.prototype.testDraw = function() {
-	this.faggotDraw();
-	var _g = 0, _g1 = buildingblocks.Canvas.Images;
+buildingblocksspec.CanvasSpec.prototype.tearDown = function() {
+	var _g = 0, _g1 = this.images;
 	while(_g < _g1.length) {
 		var image = _g1[_g];
 		++_g;
-		this.assertTrue(image.Source().style.display == "none",{ fileName : "CanvasSpec.hx", lineNumber : 30, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
+		buildingblocks.Canvas.RemoveImage(image);
 	}
-	this.assertFalse(js.Lib.document.getElementById("f242444g1524g134g1e4r1g4dfgfaggot") != null,{ fileName : "CanvasSpec.hx", lineNumber : 32, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
-	this.assertTrue(buildingblocks.Canvas.Context.drawImage != null,{ fileName : "CanvasSpec.hx", lineNumber : 33, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
-	this.assertTrue(buildingblocks.Canvas.Draw() == null,{ fileName : "CanvasSpec.hx", lineNumber : 34, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
+	var _g = 0, _g1 = this.texts;
+	while(_g < _g1.length) {
+		var text = _g1[_g];
+		++_g;
+		buildingblocks.Canvas.RemoveText(text);
+	}
+}
+buildingblocksspec.CanvasSpec.prototype.testStatics = function() {
+	this.assertTrue(buildingblocks.Canvas.Self != null,{ fileName : "CanvasSpec.hx", lineNumber : 36, className : "buildingblocksspec.CanvasSpec", methodName : "testStatics"});
+	this.assertTrue(buildingblocks.Canvas.Context != null,{ fileName : "CanvasSpec.hx", lineNumber : 37, className : "buildingblocksspec.CanvasSpec", methodName : "testStatics"});
+}
+buildingblocksspec.CanvasSpec.prototype.testDraw = function() {
+	var $it0 = buildingblocks.Canvas.Images.iterator();
+	while( $it0.hasNext() ) {
+		var image = $it0.next();
+		this.assertTrue(image.Source().style.display == "none",{ fileName : "CanvasSpec.hx", lineNumber : 43, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
+	}
+	this.assertFalse(js.Lib.document.getElementById("f242444g1524g134g1e4r1g4dfgfaggot") != null,{ fileName : "CanvasSpec.hx", lineNumber : 45, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
+	this.assertTrue(buildingblocks.Canvas.Context.drawImage != null,{ fileName : "CanvasSpec.hx", lineNumber : 46, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
+	this.assertTrue(buildingblocks.Canvas.Draw() == null,{ fileName : "CanvasSpec.hx", lineNumber : 47, className : "buildingblocksspec.CanvasSpec", methodName : "testDraw"});
 }
 buildingblocksspec.CanvasSpec.prototype.__class__ = buildingblocksspec.CanvasSpec;
 List = function(p) {
@@ -1357,17 +1450,91 @@ furytest.BuildingBlocksTest.main = function() {
 	});
 }
 furytest.BuildingBlocksTest.prototype.__class__ = furytest.BuildingBlocksTest;
+Hash = function(p) {
+	if( p === $_ ) return;
+	this.h = {}
+	if(this.h.__proto__ != null) {
+		this.h.__proto__ = null;
+		delete(this.h.__proto__);
+	}
+}
+Hash.__name__ = ["Hash"];
+Hash.prototype.h = null;
+Hash.prototype.set = function(key,value) {
+	this.h["$" + key] = value;
+}
+Hash.prototype.get = function(key) {
+	return this.h["$" + key];
+}
+Hash.prototype.exists = function(key) {
+	try {
+		key = "$" + key;
+		return this.hasOwnProperty.call(this.h,key);
+	} catch( e ) {
+		for(var i in this.h) if( i == key ) return true;
+		return false;
+	}
+}
+Hash.prototype.remove = function(key) {
+	if(!this.exists(key)) return false;
+	delete(this.h["$" + key]);
+	return true;
+}
+Hash.prototype.keys = function() {
+	var a = new Array();
+	for(var i in this.h) a.push(i.substr(1));
+	return a.iterator();
+}
+Hash.prototype.iterator = function() {
+	return { ref : this.h, it : this.keys(), hasNext : function() {
+		return this.it.hasNext();
+	}, next : function() {
+		var i = this.it.next();
+		return this.ref["$" + i];
+	}};
+}
+Hash.prototype.toString = function() {
+	var s = new StringBuf();
+	s.b[s.b.length] = "{" == null?"null":"{";
+	var it = this.keys();
+	while( it.hasNext() ) {
+		var i = it.next();
+		s.b[s.b.length] = i == null?"null":i;
+		s.b[s.b.length] = " => " == null?"null":" => ";
+		s.add(Std.string(this.get(i)));
+		if(it.hasNext()) s.b[s.b.length] = ", " == null?"null":", ";
+	}
+	s.b[s.b.length] = "}" == null?"null":"}";
+	return s.b.join("");
+}
+Hash.prototype.__class__ = Hash;
 buildingblocks.Canvas = function() { }
 buildingblocks.Canvas.__name__ = ["buildingblocks","Canvas"];
 buildingblocks.Canvas.RegisterImage = function(img) {
-	var index = buildingblocks.Canvas.Images.length;
-	buildingblocks.Canvas.Images.push(img);
+	var index = buildingblocks.Canvas.ImageCount + "-" + img.Id();
+	buildingblocks.Canvas.Images.set(index,img);
+	buildingblocks.Canvas.ImageCount += 1;
 	return index;
 }
+buildingblocks.Canvas.RemoveImage = function(img) {
+	if(buildingblocks.Canvas.Images.remove(img.Index())) {
+		buildingblocks.Canvas.ImageCount -= 1;
+		return true;
+	}
+	return false;
+}
 buildingblocks.Canvas.RegisterText = function(txt) {
-	var index = buildingblocks.Canvas.Texts.length;
-	buildingblocks.Canvas.Texts.push(txt);
+	var index = buildingblocks.Canvas.TextCount + "-" + txt.Id();
+	buildingblocks.Canvas.Texts.set(index,txt);
+	buildingblocks.Canvas.TextCount += 1;
 	return index;
+}
+buildingblocks.Canvas.RemoveText = function(txt) {
+	if(buildingblocks.Canvas.Texts.remove(txt.Index())) {
+		buildingblocks.Canvas.TextCount -= 1;
+		return true;
+	}
+	return false;
 }
 buildingblocks.Canvas.Draw = function() {
 	buildingblocks.Canvas.Self.setAttribute("width",buildingblocks.Canvas.Configuration.width + "px");
@@ -1377,24 +1544,28 @@ buildingblocks.Canvas.Draw = function() {
 	var ratio = buildingblocks.Canvas.Configuration.reference_width / buildingblocks.Canvas.Configuration.reference_height;
 	var width = buildingblocks.Canvas.Configuration.width;
 	var height = width / ratio;
-	var k_y = height / buildingblocks.Canvas.Configuration.height;
 	var band_height = (buildingblocks.Canvas.Configuration.height - height) / 2;
-	var _g = 0, _g1 = buildingblocks.Canvas.Images;
-	while(_g < _g1.length) {
-		var image = _g1[_g];
-		++_g;
+	var lambda_converter = (function() {
+		return { Size : function(s) {
+			return { width : s.width / 100 * width, height : s.height / 100 * height};
+		}, Position : function(p) {
+			return { x : p.x / 100 * width, y : p.y / 100 * height + band_height};
+		}};
+	})();
+	var $it0 = buildingblocks.Canvas.Images.iterator();
+	while( $it0.hasNext() ) {
+		var image = $it0.next();
 		var source_position = image.Jsonify().source_position;
 		var source_size = image.Jsonify().source_size;
-		var position = image.Jsonify().position;
-		var size = image.Jsonify().size;
+		var position = lambda_converter.Position(image.Jsonify().position);
+		var size = lambda_converter.Size(image.Jsonify().size);
 		var skew = { cos : Math.cos(image.Jsonify().angle), sin : Math.sin(image.Jsonify().angle)};
 		buildingblocks.Canvas.Context.setTransform(skew.cos,skew.sin,-skew.sin,skew.cos,0,0);
-		buildingblocks.Canvas.Context.drawImage(image.Source(),source_position.x,source_position.y,source_size.width,source_size.height,position.x * width / 100,position.y * height / 100 + band_height,size.width * width / 100,size.height * height / 100);
+		buildingblocks.Canvas.Context.drawImage(image.Source(),source_position.x,source_position.y,source_size.width,source_size.height,position.x,position.y,size.width,size.height);
 	}
-	var _g = 0, _g1 = buildingblocks.Canvas.Texts;
-	while(_g < _g1.length) {
-		var text = _g1[_g];
-		++_g;
+	var $it1 = buildingblocks.Canvas.Texts.iterator();
+	while( $it1.hasNext() ) {
+		var text = $it1.next();
 		var a = { cos : Math.cos(text.Jsonify().angle), sin : Math.sin(text.Jsonify().angle)};
 		buildingblocks.Canvas.Context.setTransform(a.cos,a.sin,-a.sin,a.cos,0,0);
 		buildingblocks.Canvas.Context.textAlign = text.Jsonify().align;
@@ -1402,10 +1573,10 @@ buildingblocks.Canvas.Draw = function() {
 		buildingblocks.Canvas.Context.fillStyle = text.Jsonify().text_color;
 		buildingblocks.Canvas.Context.strokeStyle = text.Jsonify().outline_color;
 		buildingblocks.Canvas.Context.font = text.Jsonify().text_font;
-		var p = text.Jsonify().position;
+		var p = lambda_converter.Position(text.Jsonify().position);
 		var t = text.Jsonify().raw_text;
-		buildingblocks.Canvas.Context.fillText(t,p.x * width / 100,p.y * height / 100 + band_height);
-		buildingblocks.Canvas.Context.strokeText(t,p.x * width / 100,p.y * height / 100 + band_height);
+		buildingblocks.Canvas.Context.fillText(t,p.x,p.y);
+		buildingblocks.Canvas.Context.strokeText(t,p.x,p.y);
 	}
 	buildingblocks.Canvas.Context.setTransform(1,0,0,1,0,0);
 	buildingblocks.Canvas.Context.fillStyle = "black";
@@ -1431,7 +1602,7 @@ buildingblocks.Text = function(data) {
 	if( data === $_ ) return;
 	buildingblocks.Element.call(this);
 	this.text_data = data;
-	buildingblocks.Canvas.RegisterText(this);
+	this.index = buildingblocks.Canvas.RegisterText(this);
 }
 buildingblocks.Text.__name__ = ["buildingblocks","Text"];
 buildingblocks.Text.__super__ = buildingblocks.Element;
@@ -1439,6 +1610,15 @@ for(var k in buildingblocks.Element.prototype ) buildingblocks.Text.prototype[k]
 buildingblocks.Text.prototype.text_data = null;
 buildingblocks.Text.prototype.Jsonify = function() {
 	return this.text_data;
+}
+buildingblocks.Text.prototype.Hide = function() {
+	if(this.index == null) return;
+	buildingblocks.Canvas.RemoveText(this);
+	this.index = null;
+}
+buildingblocks.Text.prototype.Show = function() {
+	if(this.index != null) return;
+	this.index = buildingblocks.Canvas.RegisterText(this);
 }
 buildingblocks.Text.prototype.__class__ = buildingblocks.Text;
 $_ = {}
@@ -1519,8 +1699,10 @@ buildingblocks.Element.Parent = (function() {
 	return jq;
 })();
 js.Lib.onerror = null;
-buildingblocks.Canvas.Images = [];
-buildingblocks.Canvas.Texts = [];
+buildingblocks.Canvas.Images = new Hash();
+buildingblocks.Canvas.ImageCount = 0;
+buildingblocks.Canvas.Texts = new Hash();
+buildingblocks.Canvas.TextCount = 0;
 buildingblocks.Canvas.Configuration = { reference_width : 2560.0, reference_height : 1600.0, width : 800.0, height : 600.0};
 buildingblocks.Canvas.Self = (function() {
 	var body = new js.JQuery("body");
@@ -1529,7 +1711,7 @@ buildingblocks.Canvas.Self = (function() {
 })();
 buildingblocks.Canvas.Context = (function() {
 	if(buildingblocks.Canvas.Self == null) {
-		haxe.Log.trace("You need to place this code AFTER the <canvas> tag in body in order for this to work!",{ fileName : "Canvas.hx", lineNumber : 27, className : "buildingblocks.Canvas"});
+		haxe.Log.trace("You need to place this code AFTER the <canvas> tag in body in order for this to work!",{ fileName : "Canvas.hx", lineNumber : 29, className : "buildingblocks.Canvas"});
 		throw "Javascript Location Error : try placing the <javascript> AFTER the <canvas> tag";
 		return;
 	}

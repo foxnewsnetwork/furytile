@@ -8,10 +8,24 @@ class Text extends Element {
 	public function new(data : TextData) { 
 		super();
 		this.text_data = data;
-		Canvas.RegisterText(this);
+		this.index = Canvas.RegisterText(this);
 	} // new
 	
 	public function Jsonify() : TextData { 
 		return this.text_data;
 	} // TextData
+	
+	public override function Hide() : Void { 
+		if ( this.index == null )
+			return;
+		Canvas.RemoveText(this);
+		this.index = null;
+	} // Hide
+	
+	public override function Show() : Void { 
+		if ( this.index != null ) { 
+			return;
+		} // if
+		this.index = Canvas.RegisterText(this);
+	} // Show
 } // Text

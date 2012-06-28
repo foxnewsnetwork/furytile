@@ -7,8 +7,10 @@ import buildingblocksdata.TextData;
 
 // Static canvas class
 class Canvas {
-	public static var Images : Array<Image> = [];
-	public static var Texts : Array<Text> = [];
+	public static var Images : Hash<Image> = new Hash<Image>();
+	public static var ImageCount = 0;
+	public static var Texts : Hash<Text> = new Hash<Text>();
+	public static var TextCount = 0;
 	public static var Configuration : CanvasData = { 
 		reference_width : 2560.0 ,
 		reference_height : 1600.0 ,
@@ -31,16 +33,32 @@ class Canvas {
 		return Canvas.Self.getContext("2d");
 	})(); // Context
 	// Returns the index
-	public static function RegisterImage( img : Image ) : Int { 
-		var index = Canvas.Images.length;
-		Canvas.Images.push(img);
+	public static function RegisterImage( img : Image ) : String { 
+		var index = Canvas.ImageCount + "-" + img.Id();
+		Canvas.Images.set(index, img);
+		Canvas.ImageCount += 1;
 		return index;
 	} // RegisterImage
-	public static function RegisterText( txt : Text ) : Int { 
-		var index = Canvas.Texts.length;
-		Canvas.Texts.push(txt);
+	public static function RemoveImage( img : Image ) : Bool { 
+		if ( Canvas.Images.remove(img.Index()) )  { 
+			Canvas.ImageCount -= 1;
+			return true;
+		} // if 
+		return false;
+	} // RemoveImage
+	public static function RegisterText( txt : Text ) : String { 
+		var index = Canvas.TextCount + "-" + txt.Id();
+		Canvas.Texts.set(index, txt);
+		Canvas.TextCount += 1;
 		return index;
 	} // RegisterText
+	public static function RemoveText( txt : Text ) : Bool { 
+		if ( Canvas.Texts.remove(txt.Index()) )  { 
+			Canvas.TextCount -= 1;
+			return true;
+		} // if 
+		return false;
+	} // RemoveText 
 	// Draw redraws the ENTIRE canvas
 	public static function Draw() { 
 		Canvas.Self.setAttribute("width", Canvas.Configuration.width + "px");
@@ -52,22 +70,49 @@ class Canvas {
 		var ratio = Canvas.Configuration.reference_width / Canvas.Configuration.reference_height;
 		var width = Canvas.Configuration.width;
 		var height = width / ratio;
-		var k_y = height / Canvas.Configuration.height;
 		var band_height = ( Canvas.Configuration.height - height ) / 2;
+		
+		// Step 1.5 : Conversion lambdas
+		var lambda_converter = (function() { 
+			return { 
+				Size : function( s : { width :Float, height :Float} ) { 
+					return { 
+						width : s.width / 100 * width ,
+						height : s.height / 100 * height
+					}; // return
+				} , // size
+				Position : function( p : { x :Float, y :Float } ) { 
+					return { 
+						x : p.x / 100 * width ,
+						y : p.y / 100 * height + band_height
+					}; // return
+				} // position
+			}; // return
+		})(); // lambda_converter
 		
 		// Step 2: Draw the images
 		for( image in Canvas.Images ) { 
 			var source_position = image.Jsonify().source_position;
 			var source_size = image.Jsonify().source_size;
-			var position = image.Jsonify().position ;
-			var size = image.Jsonify().size;
+			var position = lambda_converter.Position( image.Jsonify().position  );
+			var size = lambda_converter.Size( image.Jsonify().size );
 			var skew = { cos : Math.cos(image.Jsonify().angle), sin : Math.sin(image.Jsonify().angle) };
 			Canvas.Context.setTransform(skew.cos, skew.sin, -skew.sin, skew.cos, 0, 0);
-			Canvas.Context.drawImage(image.Source(), source_position.x, source_position.y, source_size.width, source_size.height, position.x * width / 100, position.y * height / 100 + band_height, size.width * width / 100, size.height * height / 100); // drawImage
+			Canvas.Context.drawImage(image.Source(), 
+				source_position.x, 
+				source_position.y, 
+				source_size.width, 
+				source_size.height, 
+				position.x, 
+				position.y, 
+				size.width, 
+				size.height
+			); // drawImage
 		} // for image
 		
 		// Step 3: Draw the texts
-		for( text in Canvas.Texts ) { 
+		for( text in Canvas.Texts ) {
+		
 			// Step a: setting the rotational matrix
 			var a = { cos : Math.cos(text.Jsonify().angle), sin : Math.sin(text.Jsonify().angle) };
 			Canvas.Context.setTransform( a.cos, a.sin, -a.sin, a.cos, 0, 0);
@@ -82,10 +127,10 @@ class Canvas {
 			Canvas.Context.font = text.Jsonify().text_font;
 			
 			// Step d: writing text
-			var p = text.Jsonify().position;
+			var p = lambda_converter.Position( text.Jsonify().position );
 			var t = text.Jsonify().raw_text;
-			Canvas.Context.fillText(t, p.x * width / 100, p.y * height / 100 + band_height);
-			Canvas.Context.strokeText(t, p.x * width / 100, p.y * height / 100 + band_height);
+			Canvas.Context.fillText(t, p.x, p.y);
+			Canvas.Context.strokeText(t, p.x, p.y);
 		} // for text
 		
 		// Step Last: Draw black bands in filler areas
