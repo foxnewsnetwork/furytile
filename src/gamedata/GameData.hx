@@ -1,0 +1,5 @@
+package gamedata;
+
+class GameData {
+
+}

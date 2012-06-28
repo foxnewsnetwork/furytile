@@ -1,0 +1,5 @@
+package gamespec;
+
+class GameStateSpec {
+
+}

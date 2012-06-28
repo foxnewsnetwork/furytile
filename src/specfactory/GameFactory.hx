@@ -1,0 +1,5 @@
+package specfactory;
+
+class GameFactory {
+
+}
