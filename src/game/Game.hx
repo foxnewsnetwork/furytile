@@ -2,9 +2,9 @@ package game;
 
 class Game {
 	// Handles user interaction
-	private var interaction_manager;
+	private var interaction_manager : Interaction;
 	// Process the game state to the next game state
-	private var logic_manager;
+	private var logic_manager : Logic;
 	// Handles drawing the game (persumably through canvas)
 	private var game_renderer;
 	// The driving variable that represents the game
