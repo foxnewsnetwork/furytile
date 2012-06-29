@@ -2,6 +2,34 @@ package tools;
 
 // Macros for generating convenient integer randoms
 class Random {
+	// Generates a funtion that random transform the input
+	// should only be used for numbers (obviously)
+	public static function Transform( ?length : Int ) : Int -> Int { 
+		var l = 5;
+		if ( length != null )
+			l = length;
+		var transforms = [function(a) { 
+			return a; 
+		}]; // transform
+		for( k in 0...l ) { 
+			var a = Random.Number(9); var b = Random.Number(9); var c = Random.Number(9);
+			transforms.push((function(x,y,z){
+				return function(j : Int) : Int { 
+					return x * j + y - z;
+				}; // return
+			})(a,b,c)); // transforms.push
+		} // for k
+		var transform = (function(fun : Array<Int->Int>){ 
+			return function(a){ 
+				for( f in fun ) { 
+					a = f(a);
+				} // for
+				return a;
+			}; // return
+		} )(transforms); // transform
+		return transform;
+	} // Transform
+
 	// Defaults to between 0 -> 99 (inclusive)
 	public static function Number( ?upper_cap : Int ) : Int { 
 		var cap = 100;
