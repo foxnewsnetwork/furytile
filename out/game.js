@@ -603,6 +603,7 @@ furytest.GameTest.main = function() {
 	runner.add(new gamespec.LogicSpec());
 	runner.add(new gamespec.GameStateSpec());
 	runner.add(new gamespec.InteractionSpec());
+	runner.add(new gamespec.RendererSpec());
 	runner.run();
 }
 furytest.GameTest.prototype.__class__ = furytest.GameTest;
@@ -854,6 +855,27 @@ gamespec.InteractionSpec.prototype.testInteraction = function() {
 	haxe.Log.trace("Your interactions are required to pass this test. Mouse the mouse around and hit the keyboard!",{ fileName : "InteractionSpec.hx", lineNumber : 42, className : "gamespec.InteractionSpec", methodName : "testInteraction"});
 }
 gamespec.InteractionSpec.prototype.__class__ = gamespec.InteractionSpec;
+game.Renderer = function(state) {
+	if( state === $_ ) return;
+	var me = this;
+	this.images = [];
+	this.texts = [];
+	this.gamestate = state;
+	dispatch.EventCannon.Listen(gamedata.GameStateDataChangedEvent.Name,function(e) {
+		me.p_processgamestate(e);
+	});
+}
+game.Renderer.__name__ = ["game","Renderer"];
+game.Renderer.prototype.images = null;
+game.Renderer.prototype.texts = null;
+game.Renderer.prototype.gamestate = null;
+game.Renderer.prototype.Draw = function() {
+	buildingblocks.Canvas.Draw();
+}
+game.Renderer.prototype.p_processgamestate = function(event) {
+	throw "Not Implemented Error : Please do not try to implement abstract classes";
+}
+game.Renderer.prototype.__class__ = game.Renderer;
 IntIter = function(min,max) {
 	if( min === $_ ) return;
 	this.min = min;
@@ -869,6 +891,42 @@ IntIter.prototype.next = function() {
 	return this.min++;
 }
 IntIter.prototype.__class__ = IntIter;
+gamespec.RendererSpec = function(p) {
+	if( p === $_ ) return;
+	haxespec.FuryTestCase.call(this);
+}
+gamespec.RendererSpec.__name__ = ["gamespec","RendererSpec"];
+gamespec.RendererSpec.__super__ = haxespec.FuryTestCase;
+for(var k in haxespec.FuryTestCase.prototype ) gamespec.RendererSpec.prototype[k] = haxespec.FuryTestCase.prototype[k];
+gamespec.RendererSpec.prototype.artist = null;
+gamespec.RendererSpec.prototype.gamestate = null;
+gamespec.RendererSpec.prototype.setup = function() {
+	this.gamestate = new game.GameState();
+	this.artist = new gamespec.TestRenderer(this.gamestate);
+	this.gamestate.Set("faggot",0);
+}
+gamespec.RendererSpec.prototype.tearDown = function() {
+	this.artist = null;
+}
+gamespec.RendererSpec.prototype.testInheritanceScheme = function() {
+	this.gamestate.Modify("faggot",11);
+	this.assertEquals(100,this.artist.testval,{ fileName : "RendererSpec.hx", lineNumber : 21, className : "gamespec.RendererSpec", methodName : "testInheritanceScheme"});
+	this.assertTrue(this.artist.testval != 0,{ fileName : "RendererSpec.hx", lineNumber : 22, className : "gamespec.RendererSpec", methodName : "testInheritanceScheme"});
+}
+gamespec.RendererSpec.prototype.__class__ = gamespec.RendererSpec;
+gamespec.TestRenderer = function(g) {
+	if( g === $_ ) return;
+	game.Renderer.call(this,g);
+	this.testval = 0;
+}
+gamespec.TestRenderer.__name__ = ["gamespec","TestRenderer"];
+gamespec.TestRenderer.__super__ = game.Renderer;
+for(var k in game.Renderer.prototype ) gamespec.TestRenderer.prototype[k] = game.Renderer.prototype[k];
+gamespec.TestRenderer.prototype.testval = null;
+gamespec.TestRenderer.prototype.p_processgamestate = function(e) {
+	this.testval = 100;
+}
+gamespec.TestRenderer.prototype.__class__ = gamespec.TestRenderer;
 Std = function() { }
 Std.__name__ = ["Std"];
 Std["is"] = function(v,t) {

@@ -6,7 +6,7 @@ class Game {
 	// Process the game state to the next game state
 	private var logic_manager : Logic;
 	// Handles drawing the game (persumably through canvas)
-	private var game_renderer;
+	private var game_renderer : Renderer;
 	// The driving variable that represents the game
 	private var game_state : GameState;
 	

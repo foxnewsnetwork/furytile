@@ -32,4 +32,17 @@ For reliability reasons, each package also ships with a xxxspec package for test
 
 For simple serialization and cross-platform communication, each class also ships with and xxxdata
 package which contains all the members of a class with the idea being that it would be easy to 
-serialize data of any given class to be shipped off through some pipeline somewhere else
+serialize data of any given class to be shipped off through some pipeline somewhere else\
+
+Notes on Cross-platforming
+=
+Because Furytile is built with the original intention of running html5 and so heavily utilizes the canvas
+and other such tools, cross-platforming it to compile and work somewhere else (even with haxe) will
+be  tricky. But it can be done. As of right now, the only files that must be adapted to other platform
+are as follows:
+
+1. buildingblocks package
+2. game.Interaction.hx
+3. gamespec.InteractionSpec.hx
+
+That's quite a lot, but it can't be helped since canvas is different from the other beasts -_-
