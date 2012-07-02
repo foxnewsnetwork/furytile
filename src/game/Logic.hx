@@ -1,11 +1,13 @@
 package game;
+import buildingblocks.CoreObject;
 
-class Logic {
+class Logic extends CoreObject {
 	private var rules : Array<GameState -> Void>;
 	private var metarules : Array<Logic -> Void>;
 	private var current_state : GameState;
 	
-	public function new() { 
+	public function new() {
+		super(); 
 		this.rules = [];
 		this.metarules = [];
 	} // new	

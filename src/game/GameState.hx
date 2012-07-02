@@ -1,11 +1,15 @@
 package game;
+import buildingblocks.CoreObject;
 import dispatch.EventCannon;
+import dispatch.EventLaser;
 import gamedata.GameStateData;
 
-class GameState {
+// GameState really should be a static class
+class GameState extends CoreObject {
 	private var gamestate_data : GameStateData;
 	
 	public function new(?data : GameStateData) { 
+		super();
 		if ( data != null )
 			this.gamestate_data = data;
 		else
@@ -20,7 +24,7 @@ class GameState {
 		return null;
 	} // Hashify
 	
-	public function Get(key){ 
+	public function Get(key) : Dynamic { 
 		return this.gamestate_data.Get(key);
 	} // Get
 	public function Modify<T>( key , value : T ) { 
@@ -30,7 +34,7 @@ class GameState {
 		} // if
 		return;
 	} // Modify
-	public function Set<T>( key, value : T) { 
+	public function Set ( key, value : Dynamic ) { 
 		this.gamestate_data.Set(key, value);
 	} // Set
 	public function Exists( key ) : Bool { 

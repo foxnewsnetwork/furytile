@@ -1,14 +1,16 @@
 package game;
+import buildingblocks.CoreObject;
 import js.JQuery;
 import buildingblocks.Canvas;
 import gamedata.InteractionData;
 
-class Interaction {
+class Interaction extends CoreObject {
 	public static var ID = 0;
 	public static var Actions = ['keydown','keypress','keyup','mouseclick','mouseover','mouseleave', 'mousemove'];
 	private var interactions : Hash<Hash<JqEvent->Void>>;
 	
 	public function new() { 
+		super();
 		this.interactions = new Hash<Hash<JqEvent->Void>>();
 		var canvas = new JQuery("canvas");
 		var body = new JQuery("body");

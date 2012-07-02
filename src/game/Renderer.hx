@@ -1,28 +1,40 @@
 package game;
 import buildingblocks.Canvas;
-import buildingblocks.Text;
-import buildingblocks.Image;
+import buildingblocks.CoreObject;
 import dispatch.EventCannon;
 import gamedata.GameStateData;
+import gamedata.GameObjectData;
 
-class Renderer {
-	private var images : Array<Image>;
-	private var texts : Array<Text>;
+
+class Renderer extends CoreObject {
+	private var gameobjects : Array<GameObject>;
 	private var gamestate : GameState;
 	
 	public function new(state : GameState) { 
-		this.images = [];
-		this.texts = [];
+		super();
+		this.gameobjects = [];
 		this.gamestate = state;
 		
 		EventCannon.Listen(GameStateDataChangedEvent.Name, function(e) { 
 			this.p_processgamestate(e);
 		} ); // registering the event
+		
+		EventCannon.Listen(GameObjectCreatedEvent.Name, function(e) { 
+			this.Register(e.gameobject);
+		} ); // Listen obj created
 	} // new
 	
 	public function Draw() { 
 		Canvas.Draw();
 	} // Draw
+	
+	public function Register( gameobject : GameObject ) : Void { 
+		this.gameobjects.push(gameobject);
+	} // Register
+	
+	public function Remove( gameobject : GameObject) : Bool { 
+		return this.gameobjects.remove(gameobject);
+	} // Remove
 	
 	// Private section
 	// Please note that changing the gamestate in this function WILL
@@ -30,4 +42,5 @@ class Renderer {
 	private function p_processgamestate( event ) { 
 		throw "Not Implemented Error : Please do not try to implement abstract classes";
 	} // p_processgamestate
+	
 } // Renderer

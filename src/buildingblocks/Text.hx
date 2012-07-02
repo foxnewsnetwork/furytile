@@ -15,6 +15,18 @@ class Text extends Element {
 		return this.text_data;
 	} // TextData
 	
+	public function TextData( ?data : TextData ) { 
+		if( data != null )
+			this.text_data = data;
+		return this.text_data;
+	} // TextData
+	
+	public function Position( ?p : { x : Float, y : Float } ) { 
+		if( p != null )
+			this.text_data.position = p;
+		return this.text_data.position;
+	} // Position
+	
 	public override function Hide() : Void { 
 		if ( this.index == null )
 			return;

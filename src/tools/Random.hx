@@ -2,6 +2,10 @@ package tools;
 
 // Macros for generating convenient integer randoms
 class Random {
+	public static function OneOf<T>( stuff : Array<T> ) { 
+		return stuff[Random.Number(stuff.length)];
+	} // OneOf
+
 	// Generates a funtion that random transform the input
 	// should only be used for numbers (obviously)
 	public static function Transform( ?length : Int ) : Int -> Int { 
@@ -68,4 +72,9 @@ class Random {
 		} // for k
 		return "#" + Lambda.map(rand_arr, function(n) { return hex[n]; } ).join("");
 	} // Hex
+	
+	//always in radians
+	public static function Angle() : Float { 
+		return Random.Number(360) * Math.PI / 180;
+	}  // Angle
 } // Random
