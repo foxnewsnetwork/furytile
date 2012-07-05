@@ -3,9 +3,9 @@ package dispatch;
 class EventCannon {
 	public static var event_storage = new Hash< Array< Dynamic -> Void > >();
 	
-	public static function Listen( name : String, cb : Dynamic -> Void ) { 
+	public static function Listen( name : String, cb : Dynamic -> Void, ?pos : haxe.PosInfos ) { 
 		if ( !EventCannon.event_storage.exists(name) )
-			EventCannon.event_storage.set(name, [function(e) { trace(e); } ]);	
+			EventCannon.event_storage.set(name, [function(e) { haxe.Log.trace(e, pos); } ]);	
 		EventCannon.event_storage.get(name).push( cb );
 	} // Listen
 	

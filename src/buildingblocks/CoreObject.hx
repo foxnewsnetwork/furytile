@@ -15,7 +15,7 @@ class CoreObject {
 	} // new 
 	
 	public function Listen4( eventname, callb : Event -> Void ) { 
-		if ( this.delegate_hash.exists(eventname) )
+		if ( !this.delegate_hash.exists(eventname) )
 			this.delegate_hash.set( eventname, [ function(e) { trace(e); } ] );
 		this.delegate_hash.get(eventname).push(callb);
 	} // Listen4

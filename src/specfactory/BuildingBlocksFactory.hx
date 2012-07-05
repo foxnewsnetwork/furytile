@@ -9,12 +9,11 @@ import tools.Random;
 
 class BuildingBlocksFactory {
 
-	public static function CanvasData() : CanvasData { 
+	public static function CanvasData() { 
 		return { 
-			reference_width : 2560.0 ,
-			reference_height : 1600.0 ,
-			width : Random.Number(2560) + 0.0 ,
-			height : Random.Number(1600) + 0.0
+			ratio : Random.Number(300) / 100 ,
+			width : Random.Number(1440) + 0.0 ,
+			height : Random.Number(900) + 0.0
 		}; // return
 	} // CanvasData
 	public static function ImageData() : ImageData { 
@@ -34,10 +33,11 @@ class BuildingBlocksFactory {
 	public static function TextData() : TextData { 
 		var color = "rgb(" + Random.Number(256) + "," + Random.Number(256) + "," + Random.Number(256) + ")";
 		var outline = "rgb(" + Random.Number(256) + "," + Random.Number(256) + "," + Random.Number(256) + ")";
-		var font = Random.Number(100) + "px " + ['Arial', 'sans-serif','Times New Roman'][Random.Number(3)];
+		var font = ['Arial', 'sans-serif','Times New Roman'][Random.Number(3)];
 		return { 
 			raw_text : Random.Text(25) ,
 			text_font : font ,
+			text_size : Random.Number(100) ,
 			text_color : color ,
 			outline_color : outline ,
 			align : ['start','end','left','right','center'][Random.Number(5)] ,
@@ -50,5 +50,4 @@ class BuildingBlocksFactory {
 	public static function Text() : Text { 
 		return new Text( BuildingBlocksFactory.TextData() );
 	} // Text
-	
 } // BuildingBlocksFactory

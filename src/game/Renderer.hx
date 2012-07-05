@@ -19,9 +19,6 @@ class Renderer extends CoreObject {
 			this.p_processgamestate(e);
 		} ); // registering the event
 		
-		EventCannon.Listen(GameObjectCreatedEvent.Name, function(e) { 
-			this.Register(e.gameobject);
-		} ); // Listen obj created
 	} // new
 	
 	public function Draw() { 

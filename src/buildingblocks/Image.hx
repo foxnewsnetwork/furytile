@@ -23,6 +23,11 @@ class Image extends Element {
 		this.index = Canvas.RegisterImage( this );
 	} // new
 	
+	public function Angle( ?a : Float ) { 
+		if ( a != null )
+			this.image_data.angle = a;
+		return this.image_data.angle;
+	} // Angle
 	public function Jsonify() { 
 		return image_data;
 	} // Serialize	

@@ -1,8 +1,11 @@
 package buildingblocksdata;
 
 typedef CanvasData = {
-	reference_width : Float , // defaults to 2560px
-	reference_height : Float , // defaults to 1600px
-	width : Float ,
-	height : Float
+	ratio : Float , // defaults to 1.6
+	width : Float , // defaults to 800
+	height : Float , // defaults to 600
+	effective_width : Float ,
+	effective_height : Float ,
+	band_width : Float ,
+	band_height : Float
 } // CanvasData

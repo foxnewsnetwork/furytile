@@ -25,8 +25,8 @@ class GameFactory {
 	
 	public static function GameObjectPosition() { 
 		var p = { 
-			x : Random.Number(100) + 0.0, 
-			y : Random.Number(100) + 0.0 
+			x : Random.Number(50) + 0.0, 
+			y : Random.Number(50) + 0.0 
 		}; // p  
 		return p;
 	} // GameObjectPosition

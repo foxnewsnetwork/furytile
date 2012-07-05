@@ -1,12 +1,11 @@
 package game;
 import buildingblocks.CoreObject;
+import buildingblocks.Interaction;
 import gamedata.GameStateData;
 import dispatch.EventCannon;
 import dispatch.EventLaser;
 
 class Game extends CoreObject {
-	// Handles user interaction
-	private var interaction_manager : Interaction;
 	// Process the game state to the next game state
 	private var logic_manager : Logic;
 	// Handles drawing the game (persumably through canvas)
@@ -16,12 +15,12 @@ class Game extends CoreObject {
 	// objects invovled in this game
 	private var game_objects : Array<GameObject>;
 	
+		
 	public function new() {
 		super(); 
 		this.game_state = new GameState();
 		this.logic_manager = new Logic();
 		this.logic_manager.CurrentState(game_state);
-		this.interaction_manager = new Interaction();
 		this.game_renderer = new Renderer( this.game_state );
 		this.game_objects = [];
 		

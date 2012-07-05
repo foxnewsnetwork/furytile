@@ -1,5 +1,5 @@
 package gamespec;
-import gamespec.GameObjectSpec;
+
 import game.GameObject;
 import gamedata.GameObjectData;
 import gamedata.GameStateData;

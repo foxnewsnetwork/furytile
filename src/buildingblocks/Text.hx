@@ -15,6 +15,17 @@ class Text extends Element {
 		return this.text_data;
 	} // TextData
 	
+	public function Text( ?raw_txt : String ) { 
+		if ( raw_txt != null )
+			this.text_data.raw_text = raw_txt;
+		return this.text_data.raw_text;
+	} // Text
+	
+	public function Append( raw_txt : String ) { 
+		this.text_data.raw_text += raw_txt;
+		return this.text_data.raw_text;
+	} // Append
+	
 	public function TextData( ?data : TextData ) { 
 		if( data != null )
 			this.text_data = data;
@@ -27,6 +38,11 @@ class Text extends Element {
 		return this.text_data.position;
 	} // Position
 	
+	public function Angle( ?a : Float ) { 
+		if ( a != null )
+			this.text_data.angle = a;
+		return this.text_data.angle;
+	} // Angle
 	public override function Hide() : Void { 
 		if ( this.index == null )
 			return;

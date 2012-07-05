@@ -1,15 +1,611 @@
 $estr = function() { return js.Boot.__string_rec(this,''); }
-if(typeof dispatch=='undefined') dispatch = {}
-dispatch.Event = function(name,origin) {
-	if( name === $_ ) return;
-	this.name = name;
-	this.origin = origin;
+if(typeof haxe=='undefined') haxe = {}
+haxe.StackItem = { __ename__ : ["haxe","StackItem"], __constructs__ : ["CFunction","Module","FilePos","Method","Lambda"] }
+haxe.StackItem.CFunction = ["CFunction",0];
+haxe.StackItem.CFunction.toString = $estr;
+haxe.StackItem.CFunction.__enum__ = haxe.StackItem;
+haxe.StackItem.Module = function(m) { var $x = ["Module",1,m]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
+haxe.StackItem.FilePos = function(s,file,line) { var $x = ["FilePos",2,s,file,line]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
+haxe.StackItem.Method = function(classname,method) { var $x = ["Method",3,classname,method]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
+haxe.StackItem.Lambda = function(v) { var $x = ["Lambda",4,v]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
+haxe.Stack = function() { }
+haxe.Stack.__name__ = ["haxe","Stack"];
+haxe.Stack.callStack = function() {
+	return haxe.Stack.makeStack("$s");
 }
-dispatch.Event.__name__ = ["dispatch","Event"];
-dispatch.Event.prototype.name = null;
-dispatch.Event.prototype.origin = null;
-dispatch.Event.prototype.__class__ = dispatch.Event;
+haxe.Stack.exceptionStack = function() {
+	return haxe.Stack.makeStack("$e");
+}
+haxe.Stack.toString = function(stack) {
+	var b = new StringBuf();
+	var _g = 0;
+	while(_g < stack.length) {
+		var s = stack[_g];
+		++_g;
+		b.b[b.b.length] = "\nCalled from " == null?"null":"\nCalled from ";
+		haxe.Stack.itemToString(b,s);
+	}
+	return b.b.join("");
+}
+haxe.Stack.itemToString = function(b,s) {
+	var $e = (s);
+	switch( $e[1] ) {
+	case 0:
+		b.b[b.b.length] = "a C function" == null?"null":"a C function";
+		break;
+	case 1:
+		var m = $e[2];
+		b.b[b.b.length] = "module " == null?"null":"module ";
+		b.b[b.b.length] = m == null?"null":m;
+		break;
+	case 2:
+		var line = $e[4], file = $e[3], s1 = $e[2];
+		if(s1 != null) {
+			haxe.Stack.itemToString(b,s1);
+			b.b[b.b.length] = " (" == null?"null":" (";
+		}
+		b.b[b.b.length] = file == null?"null":file;
+		b.b[b.b.length] = " line " == null?"null":" line ";
+		b.b[b.b.length] = line == null?"null":line;
+		if(s1 != null) b.b[b.b.length] = ")" == null?"null":")";
+		break;
+	case 3:
+		var meth = $e[3], cname = $e[2];
+		b.b[b.b.length] = cname == null?"null":cname;
+		b.b[b.b.length] = "." == null?"null":".";
+		b.b[b.b.length] = meth == null?"null":meth;
+		break;
+	case 4:
+		var n = $e[2];
+		b.b[b.b.length] = "local function #" == null?"null":"local function #";
+		b.b[b.b.length] = n == null?"null":n;
+		break;
+	}
+}
+haxe.Stack.makeStack = function(s) {
+	var a = (function($this) {
+		var $r;
+		try {
+			$r = eval(s);
+		} catch( e ) {
+			$r = [];
+		}
+		return $r;
+	}(this));
+	var m = new Array();
+	var _g1 = 0, _g = a.length - (s == "$s"?2:0);
+	while(_g1 < _g) {
+		var i = _g1++;
+		var d = a[i].split("::");
+		m.unshift(haxe.StackItem.Method(d[0],d[1]));
+	}
+	return m;
+}
+haxe.Stack.prototype.__class__ = haxe.Stack;
+if(typeof buildingblocks=='undefined') buildingblocks = {}
+buildingblocks.Element = function(p) {
+	if( p === $_ ) return;
+	this.id = buildingblocks.Element.Count;
+	buildingblocks.Element.Count += 1;
+}
+buildingblocks.Element.__name__ = ["buildingblocks","Element"];
+buildingblocks.Element.prototype.id = null;
+buildingblocks.Element.prototype.index = null;
+buildingblocks.Element.prototype.Id = function() {
+	return this.id;
+}
+buildingblocks.Element.prototype.Index = function() {
+	return this.index;
+}
+buildingblocks.Element.prototype.Hide = function() {
+}
+buildingblocks.Element.prototype.Show = function() {
+}
+buildingblocks.Element.prototype.__class__ = buildingblocks.Element;
+buildingblocks.Image = function(data) {
+	if( data === $_ ) return;
+	buildingblocks.Element.call(this);
+	this.image_data = data;
+	var source_txt = "<img alt='image preload filler" + this.Id() + "' ";
+	source_txt += "src='" + data.source + "' ";
+	source_txt += "id='furytile-image-preload-" + this.Id() + "' ";
+	source_txt += "style='display : none; position : absolute;'/>";
+	buildingblocks.Element.Parent.append(source_txt);
+	this.source = js.Lib.document.getElementById("furytile-image-preload-" + this.Id());
+	this.index = buildingblocks.Canvas.RegisterImage(this);
+}
+buildingblocks.Image.__name__ = ["buildingblocks","Image"];
+buildingblocks.Image.__super__ = buildingblocks.Element;
+for(var k in buildingblocks.Element.prototype ) buildingblocks.Image.prototype[k] = buildingblocks.Element.prototype[k];
+buildingblocks.Image.prototype.source = null;
+buildingblocks.Image.prototype.image_data = null;
+buildingblocks.Image.prototype.Angle = function(a) {
+	if(a != null) this.image_data.angle = a;
+	return this.image_data.angle;
+}
+buildingblocks.Image.prototype.Jsonify = function() {
+	return this.image_data;
+}
+buildingblocks.Image.prototype.Source = function() {
+	return this.source;
+}
+buildingblocks.Image.prototype.Hide = function() {
+	if(this.index == null) return;
+	buildingblocks.Canvas.RemoveImage(this);
+	this.index = null;
+}
+buildingblocks.Image.prototype.Show = function() {
+	if(this.index != null) return;
+	this.index = buildingblocks.Canvas.RegisterImage(this);
+}
+buildingblocks.Image.prototype.__class__ = buildingblocks.Image;
+StringTools = function() { }
+StringTools.__name__ = ["StringTools"];
+StringTools.urlEncode = function(s) {
+	return encodeURIComponent(s);
+}
+StringTools.urlDecode = function(s) {
+	return decodeURIComponent(s.split("+").join(" "));
+}
+StringTools.htmlEscape = function(s) {
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
+}
+StringTools.htmlUnescape = function(s) {
+	return s.split("&gt;").join(">").split("&lt;").join("<").split("&amp;").join("&");
+}
+StringTools.startsWith = function(s,start) {
+	return s.length >= start.length && s.substr(0,start.length) == start;
+}
+StringTools.endsWith = function(s,end) {
+	var elen = end.length;
+	var slen = s.length;
+	return slen >= elen && s.substr(slen - elen,elen) == end;
+}
+StringTools.isSpace = function(s,pos) {
+	var c = s.charCodeAt(pos);
+	return c >= 9 && c <= 13 || c == 32;
+}
+StringTools.ltrim = function(s) {
+	var l = s.length;
+	var r = 0;
+	while(r < l && StringTools.isSpace(s,r)) r++;
+	if(r > 0) return s.substr(r,l - r); else return s;
+}
+StringTools.rtrim = function(s) {
+	var l = s.length;
+	var r = 0;
+	while(r < l && StringTools.isSpace(s,l - r - 1)) r++;
+	if(r > 0) return s.substr(0,l - r); else return s;
+}
+StringTools.trim = function(s) {
+	return StringTools.ltrim(StringTools.rtrim(s));
+}
+StringTools.rpad = function(s,c,l) {
+	var sl = s.length;
+	var cl = c.length;
+	while(sl < l) if(l - sl < cl) {
+		s += c.substr(0,l - sl);
+		sl = l;
+	} else {
+		s += c;
+		sl += cl;
+	}
+	return s;
+}
+StringTools.lpad = function(s,c,l) {
+	var ns = "";
+	var sl = s.length;
+	if(sl >= l) return s;
+	var cl = c.length;
+	while(sl < l) if(l - sl < cl) {
+		ns += c.substr(0,l - sl);
+		sl = l;
+	} else {
+		ns += c;
+		sl += cl;
+	}
+	return ns + s;
+}
+StringTools.replace = function(s,sub,by) {
+	return s.split(sub).join(by);
+}
+StringTools.hex = function(n,digits) {
+	var s = "";
+	var hexChars = "0123456789ABCDEF";
+	do {
+		s = hexChars.charAt(n & 15) + s;
+		n >>>= 4;
+	} while(n > 0);
+	if(digits != null) while(s.length < digits) s = "0" + s;
+	return s;
+}
+StringTools.fastCodeAt = function(s,index) {
+	return s.cca(index);
+}
+StringTools.isEOF = function(c) {
+	return c != c;
+}
+StringTools.prototype.__class__ = StringTools;
+if(!haxe.unit) haxe.unit = {}
+haxe.unit.TestResult = function(p) {
+	if( p === $_ ) return;
+	this.m_tests = new List();
+	this.success = true;
+}
+haxe.unit.TestResult.__name__ = ["haxe","unit","TestResult"];
+haxe.unit.TestResult.prototype.m_tests = null;
+haxe.unit.TestResult.prototype.success = null;
+haxe.unit.TestResult.prototype.add = function(t) {
+	this.m_tests.add(t);
+	if(!t.success) this.success = false;
+}
+haxe.unit.TestResult.prototype.toString = function() {
+	var buf = new StringBuf();
+	var failures = 0;
+	var $it0 = this.m_tests.iterator();
+	while( $it0.hasNext() ) {
+		var test = $it0.next();
+		if(test.success == false) {
+			buf.b[buf.b.length] = "* " == null?"null":"* ";
+			buf.add(test.classname);
+			buf.b[buf.b.length] = "::" == null?"null":"::";
+			buf.add(test.method);
+			buf.b[buf.b.length] = "()" == null?"null":"()";
+			buf.b[buf.b.length] = "\n" == null?"null":"\n";
+			buf.b[buf.b.length] = "ERR: " == null?"null":"ERR: ";
+			if(test.posInfos != null) {
+				buf.add(test.posInfos.fileName);
+				buf.b[buf.b.length] = ":" == null?"null":":";
+				buf.add(test.posInfos.lineNumber);
+				buf.b[buf.b.length] = "(" == null?"null":"(";
+				buf.add(test.posInfos.className);
+				buf.b[buf.b.length] = "." == null?"null":".";
+				buf.add(test.posInfos.methodName);
+				buf.b[buf.b.length] = ") - " == null?"null":") - ";
+			}
+			buf.add(test.error);
+			buf.b[buf.b.length] = "\n" == null?"null":"\n";
+			if(test.backtrace != null) {
+				buf.add(test.backtrace);
+				buf.b[buf.b.length] = "\n" == null?"null":"\n";
+			}
+			buf.b[buf.b.length] = "\n" == null?"null":"\n";
+			failures++;
+		}
+	}
+	buf.b[buf.b.length] = "\n" == null?"null":"\n";
+	if(failures == 0) buf.b[buf.b.length] = "OK " == null?"null":"OK "; else buf.b[buf.b.length] = "FAILED " == null?"null":"FAILED ";
+	buf.add(this.m_tests.length);
+	buf.b[buf.b.length] = " tests, " == null?"null":" tests, ";
+	buf.b[buf.b.length] = failures == null?"null":failures;
+	buf.b[buf.b.length] = " failed, " == null?"null":" failed, ";
+	buf.add(this.m_tests.length - failures);
+	buf.b[buf.b.length] = " success" == null?"null":" success";
+	buf.b[buf.b.length] = "\n" == null?"null":"\n";
+	return buf.b.join("");
+}
+haxe.unit.TestResult.prototype.__class__ = haxe.unit.TestResult;
+Reflect = function() { }
+Reflect.__name__ = ["Reflect"];
+Reflect.hasField = function(o,field) {
+	if(o.hasOwnProperty != null) return o.hasOwnProperty(field);
+	var arr = Reflect.fields(o);
+	var $it0 = arr.iterator();
+	while( $it0.hasNext() ) {
+		var t = $it0.next();
+		if(t == field) return true;
+	}
+	return false;
+}
+Reflect.field = function(o,field) {
+	var v = null;
+	try {
+		v = o[field];
+	} catch( e ) {
+	}
+	return v;
+}
+Reflect.setField = function(o,field,value) {
+	o[field] = value;
+}
+Reflect.callMethod = function(o,func,args) {
+	return func.apply(o,args);
+}
+Reflect.fields = function(o) {
+	if(o == null) return new Array();
+	var a = new Array();
+	if(o.hasOwnProperty) {
+		for(var i in o) if( o.hasOwnProperty(i) ) a.push(i);
+	} else {
+		var t;
+		try {
+			t = o.__proto__;
+		} catch( e ) {
+			t = null;
+		}
+		if(t != null) o.__proto__ = null;
+		for(var i in o) if( i != "__proto__" ) a.push(i);
+		if(t != null) o.__proto__ = t;
+	}
+	return a;
+}
+Reflect.isFunction = function(f) {
+	return typeof(f) == "function" && f.__name__ == null;
+}
+Reflect.compare = function(a,b) {
+	return a == b?0:a > b?1:-1;
+}
+Reflect.compareMethods = function(f1,f2) {
+	if(f1 == f2) return true;
+	if(!Reflect.isFunction(f1) || !Reflect.isFunction(f2)) return false;
+	return f1.scope == f2.scope && f1.method == f2.method && f1.method != null;
+}
+Reflect.isObject = function(v) {
+	if(v == null) return false;
+	var t = typeof(v);
+	return t == "string" || t == "object" && !v.__enum__ || t == "function" && v.__name__ != null;
+}
+Reflect.deleteField = function(o,f) {
+	if(!Reflect.hasField(o,f)) return false;
+	delete(o[f]);
+	return true;
+}
+Reflect.copy = function(o) {
+	var o2 = { };
+	var _g = 0, _g1 = Reflect.fields(o);
+	while(_g < _g1.length) {
+		var f = _g1[_g];
+		++_g;
+		o2[f] = Reflect.field(o,f);
+	}
+	return o2;
+}
+Reflect.makeVarArgs = function(f) {
+	return function() {
+		var a = new Array();
+		var _g1 = 0, _g = arguments.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			a.push(arguments[i]);
+		}
+		return f(a);
+	};
+}
+Reflect.prototype.__class__ = Reflect;
+haxe.Public = function() { }
+haxe.Public.__name__ = ["haxe","Public"];
+haxe.Public.prototype.__class__ = haxe.Public;
+haxe.unit.TestCase = function(p) {
+}
+haxe.unit.TestCase.__name__ = ["haxe","unit","TestCase"];
+haxe.unit.TestCase.prototype.currentTest = null;
+haxe.unit.TestCase.prototype.setup = function() {
+}
+haxe.unit.TestCase.prototype.tearDown = function() {
+}
+haxe.unit.TestCase.prototype.print = function(v) {
+	haxe.unit.TestRunner.print(v);
+}
+haxe.unit.TestCase.prototype.assertTrue = function(b,c) {
+	this.currentTest.done = true;
+	if(b == false) {
+		this.currentTest.success = false;
+		this.currentTest.error = "expected true but was false";
+		this.currentTest.posInfos = c;
+		throw this.currentTest;
+	}
+}
+haxe.unit.TestCase.prototype.assertFalse = function(b,c) {
+	this.currentTest.done = true;
+	if(b == true) {
+		this.currentTest.success = false;
+		this.currentTest.error = "expected false but was true";
+		this.currentTest.posInfos = c;
+		throw this.currentTest;
+	}
+}
+haxe.unit.TestCase.prototype.assertEquals = function(expected,actual,c) {
+	this.currentTest.done = true;
+	if(actual != expected) {
+		this.currentTest.success = false;
+		this.currentTest.error = "expected '" + expected + "' but was '" + actual + "'";
+		this.currentTest.posInfos = c;
+		throw this.currentTest;
+	}
+}
+haxe.unit.TestCase.prototype.__class__ = haxe.unit.TestCase;
+haxe.unit.TestCase.__interfaces__ = [haxe.Public];
+if(typeof haxespec=='undefined') haxespec = {}
+haxespec.FuryTestCase = function(p) {
+	if( p === $_ ) return;
+	haxe.unit.TestCase.call(this);
+}
+haxespec.FuryTestCase.__name__ = ["haxespec","FuryTestCase"];
+haxespec.FuryTestCase.__super__ = haxe.unit.TestCase;
+for(var k in haxe.unit.TestCase.prototype ) haxespec.FuryTestCase.prototype[k] = haxe.unit.TestCase.prototype[k];
+haxespec.FuryTestCase.prototype.assertIncludes = function(array,expected,pos) {
+	var flag = false;
+	var _g = 0;
+	while(_g < array.length) {
+		var given = array[_g];
+		++_g;
+		if(given == expected) {
+			flag = true;
+			break;
+		}
+	}
+	if(!flag) {
+		haxe.Log.trace("Expected " + array.toString() + " to contain ",pos);
+		haxe.Log.trace(expected,pos);
+	}
+	this.assertTrue(flag,pos);
+}
+haxespec.FuryTestCase.prototype.assertDifferent = function(expected,actual,pos) {
+	var flag = expected == actual;
+	if(flag) {
+		haxe.Log.trace("Expected ",pos);
+		haxe.Log.trace(expected,pos);
+		haxe.Log.trace(" to be different from ",pos);
+		haxe.Log.trace(actual,pos);
+	}
+	this.assertFalse(flag,pos);
+}
+haxespec.FuryTestCase.prototype.assertChange = function(when,from,to,pos) {
+	when();
+	var flag = from == to;
+	if(!flag) {
+		haxe.Log.trace("Expected ",pos);
+		haxe.Log.trace(from,pos);
+		haxe.Log.trace(" to change to ",pos);
+		haxe.Log.trace(to,pos);
+	}
+	this.assertTrue(flag,pos);
+}
+haxespec.FuryTestCase.prototype.__class__ = haxespec.FuryTestCase;
+haxe.Log = function() { }
+haxe.Log.__name__ = ["haxe","Log"];
+haxe.Log.trace = function(v,infos) {
+	js.Boot.__trace(v,infos);
+}
+haxe.Log.clear = function() {
+	js.Boot.__clear_trace();
+}
+haxe.Log.prototype.__class__ = haxe.Log;
+if(typeof furytest=='undefined') furytest = {}
+furytest.BuildingBlocksIntegrationTest = function() { }
+furytest.BuildingBlocksIntegrationTest.__name__ = ["furytest","BuildingBlocksIntegrationTest"];
+furytest.BuildingBlocksIntegrationTest.main = function() {
+	var runner = new haxe.unit.TestRunner();
+	runner.add(new buildingblocksspec.IntegrationSpec());
+	runner.run();
+}
+furytest.BuildingBlocksIntegrationTest.prototype.__class__ = furytest.BuildingBlocksIntegrationTest;
+if(typeof buildingblocksspec=='undefined') buildingblocksspec = {}
+buildingblocksspec.IntegrationSpec = function(p) {
+	if( p === $_ ) return;
+	haxespec.FuryTestCase.call(this);
+}
+buildingblocksspec.IntegrationSpec.__name__ = ["buildingblocksspec","IntegrationSpec"];
+buildingblocksspec.IntegrationSpec.__super__ = haxespec.FuryTestCase;
+for(var k in haxespec.FuryTestCase.prototype ) buildingblocksspec.IntegrationSpec.prototype[k] = haxespec.FuryTestCase.prototype[k];
+buildingblocksspec.IntegrationSpec.prototype.text_center_middle = null;
+buildingblocksspec.IntegrationSpec.prototype.text_upper_right = null;
+buildingblocksspec.IntegrationSpec.prototype.image_upper_left = null;
+buildingblocksspec.IntegrationSpec.prototype.setup = function() {
+	var center_middle = specfactory.BuildingBlocksFactory.TextData();
+	center_middle.position = { x : 40.0, y : 40.0};
+	center_middle.raw_text = "Center Middle";
+	center_middle.opacity = 1.0;
+	center_middle.text_color = "#000000";
+	center_middle.text_font = "Arial";
+	center_middle.align = "start";
+	center_middle.baseline = "top";
+	center_middle.text_size = 25;
+	center_middle.angle = Math.PI / 8;
+	this.text_center_middle = new buildingblocks.Text(center_middle);
+	var upper_right = specfactory.BuildingBlocksFactory.TextData();
+	upper_right.position = { x : 80.0, y : 5.0};
+	upper_right.raw_text = "Upper Right";
+	upper_right.align = "start";
+	upper_right.baseline = "top";
+	this.text_upper_right = new buildingblocks.Text(upper_right);
+	this.image_upper_left = specfactory.BuildingBlocksFactory.Image();
+}
+buildingblocksspec.IntegrationSpec.prototype.testProperPositions = function() {
+	var me = this;
+	tools.Stopwatch.Interval(function() {
+		var a = me.text_center_middle.Angle();
+		a += Math.PI / 50;
+		me.text_center_middle.Angle(a);
+		var b = me.text_upper_right.Angle();
+		b += Math.PI / 25;
+		me.text_upper_right.Angle(b);
+		var c = me.image_upper_left.Angle();
+		c += Math.PI / 40;
+		me.image_upper_left.Angle(c);
+		buildingblocks.Canvas.Draw();
+	},25);
+}
+buildingblocksspec.IntegrationSpec.prototype.__class__ = buildingblocksspec.IntegrationSpec;
+haxe.Timer = function(time_ms) {
+	if( time_ms === $_ ) return;
+	var arr = haxe_timers;
+	this.id = arr.length;
+	arr[this.id] = this;
+	this.timerId = window.setInterval("haxe_timers[" + this.id + "].run();",time_ms);
+}
+haxe.Timer.__name__ = ["haxe","Timer"];
+haxe.Timer.delay = function(f,time_ms) {
+	var t = new haxe.Timer(time_ms);
+	t.run = function() {
+		t.stop();
+		f();
+	};
+	return t;
+}
+haxe.Timer.measure = function(f,pos) {
+	var t0 = haxe.Timer.stamp();
+	var r = f();
+	haxe.Log.trace(haxe.Timer.stamp() - t0 + "s",pos);
+	return r;
+}
+haxe.Timer.stamp = function() {
+	return Date.now().getTime() / 1000;
+}
+haxe.Timer.prototype.id = null;
+haxe.Timer.prototype.timerId = null;
+haxe.Timer.prototype.stop = function() {
+	if(this.id == null) return;
+	window.clearInterval(this.timerId);
+	var arr = haxe_timers;
+	arr[this.id] = null;
+	if(this.id > 100 && this.id == arr.length - 1) {
+		var p = this.id - 1;
+		while(p >= 0 && arr[p] == null) p--;
+		arr = arr.slice(0,p + 1);
+	}
+	this.id = null;
+}
+haxe.Timer.prototype.run = function() {
+}
+haxe.Timer.prototype.__class__ = haxe.Timer;
 if(typeof tools=='undefined') tools = {}
+tools.Stopwatch = function() { }
+tools.Stopwatch.__name__ = ["tools","Stopwatch"];
+tools.Stopwatch.Start = function() {
+	tools.Stopwatch.TIME = haxe.Timer.stamp();
+	return tools.Stopwatch.TIME;
+}
+tools.Stopwatch.Stop = function() {
+	var startTime = tools.Stopwatch.TIME;
+	var difference = tools.Stopwatch.Start() - startTime;
+	return difference;
+}
+tools.Stopwatch.Interval = function(cb,duration) {
+	var timer = new haxe.Timer(duration);
+	timer.run = cb;
+	return timer;
+}
+tools.Stopwatch.prototype.__class__ = tools.Stopwatch;
+StringBuf = function(p) {
+	if( p === $_ ) return;
+	this.b = new Array();
+}
+StringBuf.__name__ = ["StringBuf"];
+StringBuf.prototype.add = function(x) {
+	this.b[this.b.length] = x == null?"null":x;
+}
+StringBuf.prototype.addSub = function(s,pos,len) {
+	this.b[this.b.length] = s.substr(pos,len);
+}
+StringBuf.prototype.addChar = function(c) {
+	this.b[this.b.length] = String.fromCharCode(c);
+}
+StringBuf.prototype.toString = function() {
+	return this.b.join("");
+}
+StringBuf.prototype.b = null;
+StringBuf.prototype.__class__ = StringBuf;
 tools.Random = function() { }
 tools.Random.__name__ = ["tools","Random"];
 tools.Random.OneOf = function(stuff) {
@@ -104,6 +700,31 @@ IntIter.prototype.next = function() {
 	return this.min++;
 }
 IntIter.prototype.__class__ = IntIter;
+Std = function() { }
+Std.__name__ = ["Std"];
+Std["is"] = function(v,t) {
+	return js.Boot.__instanceof(v,t);
+}
+Std.string = function(s) {
+	return js.Boot.__string_rec(s,"");
+}
+Std["int"] = function(x) {
+	if(x < 0) return Math.ceil(x);
+	return Math.floor(x);
+}
+Std.parseInt = function(x) {
+	var v = parseInt(x,10);
+	if(v == 0 && x.charCodeAt(1) == 120) v = parseInt(x);
+	if(isNaN(v)) return null;
+	return v;
+}
+Std.parseFloat = function(x) {
+	return parseFloat(x);
+}
+Std.random = function(x) {
+	return Math.floor(Math.random() * x);
+}
+Std.prototype.__class__ = Std;
 Lambda = function() { }
 Lambda.__name__ = ["Lambda"];
 Lambda.array = function(it) {
@@ -356,1235 +977,6 @@ List.prototype.map = function(f) {
 	return b;
 }
 List.prototype.__class__ = List;
-if(typeof gamedata=='undefined') gamedata = {}
-gamedata.GameObjectCreatedEvent = function(gameobject) {
-	if( gameobject === $_ ) return;
-	dispatch.Event.call(this,gamedata.GameObjectCreatedEvent.Name,0);
-	this.gameobject = gameobject;
-}
-gamedata.GameObjectCreatedEvent.__name__ = ["gamedata","GameObjectCreatedEvent"];
-gamedata.GameObjectCreatedEvent.__super__ = dispatch.Event;
-for(var k in dispatch.Event.prototype ) gamedata.GameObjectCreatedEvent.prototype[k] = dispatch.Event.prototype[k];
-gamedata.GameObjectCreatedEvent.prototype.gameobject = null;
-gamedata.GameObjectCreatedEvent.prototype.__class__ = gamedata.GameObjectCreatedEvent;
-gamedata.GameObjectPositionEvent = function(ok,p) {
-	if( ok === $_ ) return;
-	dispatch.Event.call(this,gamedata.GameObjectPositionEvent.Name,0);
-	this.object_key = ok;
-	this.position = p;
-}
-gamedata.GameObjectPositionEvent.__name__ = ["gamedata","GameObjectPositionEvent"];
-gamedata.GameObjectPositionEvent.__super__ = dispatch.Event;
-for(var k in dispatch.Event.prototype ) gamedata.GameObjectPositionEvent.prototype[k] = dispatch.Event.prototype[k];
-gamedata.GameObjectPositionEvent.prototype.object_key = null;
-gamedata.GameObjectPositionEvent.prototype.position = null;
-gamedata.GameObjectPositionEvent.prototype.__class__ = gamedata.GameObjectPositionEvent;
-if(typeof haxe=='undefined') haxe = {}
-haxe.Public = function() { }
-haxe.Public.__name__ = ["haxe","Public"];
-haxe.Public.prototype.__class__ = haxe.Public;
-if(!haxe.unit) haxe.unit = {}
-haxe.unit.TestCase = function(p) {
-}
-haxe.unit.TestCase.__name__ = ["haxe","unit","TestCase"];
-haxe.unit.TestCase.prototype.currentTest = null;
-haxe.unit.TestCase.prototype.setup = function() {
-}
-haxe.unit.TestCase.prototype.tearDown = function() {
-}
-haxe.unit.TestCase.prototype.print = function(v) {
-	haxe.unit.TestRunner.print(v);
-}
-haxe.unit.TestCase.prototype.assertTrue = function(b,c) {
-	this.currentTest.done = true;
-	if(b == false) {
-		this.currentTest.success = false;
-		this.currentTest.error = "expected true but was false";
-		this.currentTest.posInfos = c;
-		throw this.currentTest;
-	}
-}
-haxe.unit.TestCase.prototype.assertFalse = function(b,c) {
-	this.currentTest.done = true;
-	if(b == true) {
-		this.currentTest.success = false;
-		this.currentTest.error = "expected false but was true";
-		this.currentTest.posInfos = c;
-		throw this.currentTest;
-	}
-}
-haxe.unit.TestCase.prototype.assertEquals = function(expected,actual,c) {
-	this.currentTest.done = true;
-	if(actual != expected) {
-		this.currentTest.success = false;
-		this.currentTest.error = "expected '" + expected + "' but was '" + actual + "'";
-		this.currentTest.posInfos = c;
-		throw this.currentTest;
-	}
-}
-haxe.unit.TestCase.prototype.__class__ = haxe.unit.TestCase;
-haxe.unit.TestCase.__interfaces__ = [haxe.Public];
-if(typeof haxespec=='undefined') haxespec = {}
-haxespec.FuryTestCase = function(p) {
-	if( p === $_ ) return;
-	haxe.unit.TestCase.call(this);
-}
-haxespec.FuryTestCase.__name__ = ["haxespec","FuryTestCase"];
-haxespec.FuryTestCase.__super__ = haxe.unit.TestCase;
-for(var k in haxe.unit.TestCase.prototype ) haxespec.FuryTestCase.prototype[k] = haxe.unit.TestCase.prototype[k];
-haxespec.FuryTestCase.prototype.assertIncludes = function(array,expected,pos) {
-	var flag = false;
-	var _g = 0;
-	while(_g < array.length) {
-		var given = array[_g];
-		++_g;
-		if(given == expected) {
-			flag = true;
-			break;
-		}
-	}
-	if(!flag) {
-		haxe.Log.trace("Expected " + array.toString() + " to contain ",pos);
-		haxe.Log.trace(expected,pos);
-	}
-	this.assertTrue(flag,pos);
-}
-haxespec.FuryTestCase.prototype.assertDifferent = function(expected,actual,pos) {
-	var flag = expected == actual;
-	if(flag) {
-		haxe.Log.trace("Expected ",pos);
-		haxe.Log.trace(expected,pos);
-		haxe.Log.trace(" to be different from ",pos);
-		haxe.Log.trace(actual,pos);
-	}
-	this.assertFalse(flag,pos);
-}
-haxespec.FuryTestCase.prototype.assertChange = function(when,from,to,pos) {
-	when();
-	var flag = from == to;
-	if(!flag) {
-		haxe.Log.trace("Expected ",pos);
-		haxe.Log.trace(from,pos);
-		haxe.Log.trace(" to change to ",pos);
-		haxe.Log.trace(to,pos);
-	}
-	this.assertTrue(flag,pos);
-}
-haxespec.FuryTestCase.prototype.__class__ = haxespec.FuryTestCase;
-if(typeof gamespec=='undefined') gamespec = {}
-gamespec.LogicSpec = function(p) {
-	if( p === $_ ) return;
-	haxespec.FuryTestCase.call(this);
-}
-gamespec.LogicSpec.__name__ = ["gamespec","LogicSpec"];
-gamespec.LogicSpec.__super__ = haxespec.FuryTestCase;
-for(var k in haxespec.FuryTestCase.prototype ) gamespec.LogicSpec.prototype[k] = haxespec.FuryTestCase.prototype[k];
-gamespec.LogicSpec.prototype.logic = null;
-gamespec.LogicSpec.prototype.gamestate = null;
-gamespec.LogicSpec.prototype.rules = null;
-gamespec.LogicSpec.prototype.setup = function() {
-	haxespec.FuryTestCase.prototype.setup.call(this);
-	this.logic = new game.Logic();
-	this.rules = [];
-	var gamestatedata = new gamedata.GameStateData();
-	gamestatedata.Set("debug",0);
-	gamestatedata.Set("faggot",0);
-	this.gamestate = new game.GameState(gamestatedata);
-	var _g = 0;
-	while(_g < 10) {
-		var k = _g++;
-		var rule = tools.Random.Transform(4);
-		this.rules.push(rule);
-	}
-}
-gamespec.LogicSpec.prototype.tearDown = function() {
-	this.logic = null;
-	this.gamestate = null;
-	haxespec.FuryTestCase.prototype.tearDown.call(this);
-}
-gamespec.LogicSpec.prototype.testRules = function() {
-	var rule = function(g0) {
-		g0.Modify("debug",1);
-	};
-	this.logic.AddRule(rule);
-	this.logic.Step(this.gamestate);
-	this.assertEquals(this.gamestate.GameState().Get("debug"),1,{ fileName : "LogicSpec.hx", lineNumber : 40, className : "gamespec.LogicSpec", methodName : "testRules"});
-	this.assertEquals(this.gamestate,this.logic.CurrentState(),{ fileName : "LogicSpec.hx", lineNumber : 41, className : "gamespec.LogicSpec", methodName : "testRules"});
-}
-gamespec.LogicSpec.prototype.testTransform = function() {
-	var f = tools.Random.Transform(5);
-	this.assertTrue(f(1) != null,{ fileName : "LogicSpec.hx", lineNumber : 47, className : "gamespec.LogicSpec", methodName : "testTransform"});
-	var _g = 0;
-	while(_g < 50) {
-		var k = _g++;
-		this.assertEquals(f(k),f(k),{ fileName : "LogicSpec.hx", lineNumber : 49, className : "gamespec.LogicSpec", methodName : "testTransform"});
-	}
-}
-gamespec.LogicSpec.prototype.testRuleCascading = function() {
-	var initial_value = this.gamestate.Get("faggot");
-	var _g = 0, _g1 = this.rules;
-	while(_g < _g1.length) {
-		var f = [_g1[_g]];
-		++_g;
-		this.logic.AddRule((function(f) {
-			return function(g0) {
-				g0.Modify("faggot",f[0](g0.Get("faggot")));
-			};
-		})(f));
-		initial_value = f[0](initial_value);
-	}
-	this.logic.Step(this.gamestate);
-	this.assertEquals(this.gamestate.Get("faggot"),initial_value,{ fileName : "LogicSpec.hx", lineNumber : 64, className : "gamespec.LogicSpec", methodName : "testRuleCascading"});
-}
-gamespec.LogicSpec.prototype.__class__ = gamespec.LogicSpec;
-haxe.StackItem = { __ename__ : ["haxe","StackItem"], __constructs__ : ["CFunction","Module","FilePos","Method","Lambda"] }
-haxe.StackItem.CFunction = ["CFunction",0];
-haxe.StackItem.CFunction.toString = $estr;
-haxe.StackItem.CFunction.__enum__ = haxe.StackItem;
-haxe.StackItem.Module = function(m) { var $x = ["Module",1,m]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.StackItem.FilePos = function(s,file,line) { var $x = ["FilePos",2,s,file,line]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.StackItem.Method = function(classname,method) { var $x = ["Method",3,classname,method]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.StackItem.Lambda = function(v) { var $x = ["Lambda",4,v]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; }
-haxe.Stack = function() { }
-haxe.Stack.__name__ = ["haxe","Stack"];
-haxe.Stack.callStack = function() {
-	return haxe.Stack.makeStack("$s");
-}
-haxe.Stack.exceptionStack = function() {
-	return haxe.Stack.makeStack("$e");
-}
-haxe.Stack.toString = function(stack) {
-	var b = new StringBuf();
-	var _g = 0;
-	while(_g < stack.length) {
-		var s = stack[_g];
-		++_g;
-		b.b[b.b.length] = "\nCalled from " == null?"null":"\nCalled from ";
-		haxe.Stack.itemToString(b,s);
-	}
-	return b.b.join("");
-}
-haxe.Stack.itemToString = function(b,s) {
-	var $e = (s);
-	switch( $e[1] ) {
-	case 0:
-		b.b[b.b.length] = "a C function" == null?"null":"a C function";
-		break;
-	case 1:
-		var m = $e[2];
-		b.b[b.b.length] = "module " == null?"null":"module ";
-		b.b[b.b.length] = m == null?"null":m;
-		break;
-	case 2:
-		var line = $e[4], file = $e[3], s1 = $e[2];
-		if(s1 != null) {
-			haxe.Stack.itemToString(b,s1);
-			b.b[b.b.length] = " (" == null?"null":" (";
-		}
-		b.b[b.b.length] = file == null?"null":file;
-		b.b[b.b.length] = " line " == null?"null":" line ";
-		b.b[b.b.length] = line == null?"null":line;
-		if(s1 != null) b.b[b.b.length] = ")" == null?"null":")";
-		break;
-	case 3:
-		var meth = $e[3], cname = $e[2];
-		b.b[b.b.length] = cname == null?"null":cname;
-		b.b[b.b.length] = "." == null?"null":".";
-		b.b[b.b.length] = meth == null?"null":meth;
-		break;
-	case 4:
-		var n = $e[2];
-		b.b[b.b.length] = "local function #" == null?"null":"local function #";
-		b.b[b.b.length] = n == null?"null":n;
-		break;
-	}
-}
-haxe.Stack.makeStack = function(s) {
-	var a = (function($this) {
-		var $r;
-		try {
-			$r = eval(s);
-		} catch( e ) {
-			$r = [];
-		}
-		return $r;
-	}(this));
-	var m = new Array();
-	var _g1 = 0, _g = a.length - (s == "$s"?2:0);
-	while(_g1 < _g) {
-		var i = _g1++;
-		var d = a[i].split("::");
-		m.unshift(haxe.StackItem.Method(d[0],d[1]));
-	}
-	return m;
-}
-haxe.Stack.prototype.__class__ = haxe.Stack;
-if(typeof buildingblocks=='undefined') buildingblocks = {}
-buildingblocks.Element = function(p) {
-	if( p === $_ ) return;
-	this.id = buildingblocks.Element.Count;
-	buildingblocks.Element.Count += 1;
-}
-buildingblocks.Element.__name__ = ["buildingblocks","Element"];
-buildingblocks.Element.prototype.id = null;
-buildingblocks.Element.prototype.index = null;
-buildingblocks.Element.prototype.Id = function() {
-	return this.id;
-}
-buildingblocks.Element.prototype.Index = function() {
-	return this.index;
-}
-buildingblocks.Element.prototype.Hide = function() {
-}
-buildingblocks.Element.prototype.Show = function() {
-}
-buildingblocks.Element.prototype.__class__ = buildingblocks.Element;
-buildingblocks.Image = function(data) {
-	if( data === $_ ) return;
-	buildingblocks.Element.call(this);
-	this.image_data = data;
-	var source_txt = "<img alt='image preload filler" + this.Id() + "' ";
-	source_txt += "src='" + data.source + "' ";
-	source_txt += "id='furytile-image-preload-" + this.Id() + "' ";
-	source_txt += "style='display : none; position : absolute;'/>";
-	buildingblocks.Element.Parent.append(source_txt);
-	this.source = js.Lib.document.getElementById("furytile-image-preload-" + this.Id());
-	this.index = buildingblocks.Canvas.RegisterImage(this);
-}
-buildingblocks.Image.__name__ = ["buildingblocks","Image"];
-buildingblocks.Image.__super__ = buildingblocks.Element;
-for(var k in buildingblocks.Element.prototype ) buildingblocks.Image.prototype[k] = buildingblocks.Element.prototype[k];
-buildingblocks.Image.prototype.source = null;
-buildingblocks.Image.prototype.image_data = null;
-buildingblocks.Image.prototype.Jsonify = function() {
-	return this.image_data;
-}
-buildingblocks.Image.prototype.Source = function() {
-	return this.source;
-}
-buildingblocks.Image.prototype.Hide = function() {
-	if(this.index == null) return;
-	buildingblocks.Canvas.RemoveImage(this);
-	this.index = null;
-}
-buildingblocks.Image.prototype.Show = function() {
-	if(this.index != null) return;
-	this.index = buildingblocks.Canvas.RegisterImage(this);
-}
-buildingblocks.Image.prototype.__class__ = buildingblocks.Image;
-tools.Measure = function() { }
-tools.Measure.__name__ = ["tools","Measure"];
-tools.Measure.PointInBox = function(p,box_p,box_s) {
-	if(box_p.x <= p.x && p.x <= box_p.x + box_s.width) {
-		if(box_p.y <= p.y && p.y <= box_p.y + box_s.height) return true;
-	}
-	return false;
-}
-tools.Measure.prototype.__class__ = tools.Measure;
-dispatch.EventLaser = function() { }
-dispatch.EventLaser.__name__ = ["dispatch","EventLaser"];
-dispatch.EventLaser.core_hash = null;
-dispatch.EventLaser.Fire = function(e,who,pos) {
-	if(!dispatch.EventLaser.core_hash.exists(who + "")) {
-		haxe.Log.trace("No object exists to capture the following event : ",pos);
-		haxe.Log.trace(e,pos);
-		return;
-	}
-	var core = dispatch.EventLaser.core_hash.get(who + "");
-	if(!core.delegate_hash.exists(e.name)) {
-		haxe.Log.trace("Core object : ",pos);
-		haxe.Log.trace(core,pos);
-		haxe.Log.trace(" Does not have handlers for event : ",pos);
-		haxe.Log.trace(e,pos);
-		return;
-	}
-	var handlers = core.delegate_hash.get(e.name);
-	var _g = 0;
-	while(_g < handlers.length) {
-		var handler = handlers[_g];
-		++_g;
-		handler(e);
-	}
-}
-dispatch.EventLaser.Register = function(core) {
-	dispatch.EventLaser.core_hash.set(core.Core_Object_Id() + "",core);
-}
-dispatch.EventLaser.Unregister = function(core) {
-	return dispatch.EventLaser.core_hash.remove(core.Core_Object_Id() + "");
-}
-dispatch.EventLaser.prototype.__class__ = dispatch.EventLaser;
-gamedata.InteractionData = { __ename__ : ["gamedata","InteractionData"], __constructs__ : ["keydown","keyup","keypress","mouseclick","mouseover","mouseleave","mousemove"] }
-gamedata.InteractionData.keydown = ["keydown",0];
-gamedata.InteractionData.keydown.toString = $estr;
-gamedata.InteractionData.keydown.__enum__ = gamedata.InteractionData;
-gamedata.InteractionData.keyup = ["keyup",1];
-gamedata.InteractionData.keyup.toString = $estr;
-gamedata.InteractionData.keyup.__enum__ = gamedata.InteractionData;
-gamedata.InteractionData.keypress = ["keypress",2];
-gamedata.InteractionData.keypress.toString = $estr;
-gamedata.InteractionData.keypress.__enum__ = gamedata.InteractionData;
-gamedata.InteractionData.mouseclick = ["mouseclick",3];
-gamedata.InteractionData.mouseclick.toString = $estr;
-gamedata.InteractionData.mouseclick.__enum__ = gamedata.InteractionData;
-gamedata.InteractionData.mouseover = ["mouseover",4];
-gamedata.InteractionData.mouseover.toString = $estr;
-gamedata.InteractionData.mouseover.__enum__ = gamedata.InteractionData;
-gamedata.InteractionData.mouseleave = ["mouseleave",5];
-gamedata.InteractionData.mouseleave.toString = $estr;
-gamedata.InteractionData.mouseleave.__enum__ = gamedata.InteractionData;
-gamedata.InteractionData.mousemove = ["mousemove",6];
-gamedata.InteractionData.mousemove.toString = $estr;
-gamedata.InteractionData.mousemove.__enum__ = gamedata.InteractionData;
-StringTools = function() { }
-StringTools.__name__ = ["StringTools"];
-StringTools.urlEncode = function(s) {
-	return encodeURIComponent(s);
-}
-StringTools.urlDecode = function(s) {
-	return decodeURIComponent(s.split("+").join(" "));
-}
-StringTools.htmlEscape = function(s) {
-	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
-}
-StringTools.htmlUnescape = function(s) {
-	return s.split("&gt;").join(">").split("&lt;").join("<").split("&amp;").join("&");
-}
-StringTools.startsWith = function(s,start) {
-	return s.length >= start.length && s.substr(0,start.length) == start;
-}
-StringTools.endsWith = function(s,end) {
-	var elen = end.length;
-	var slen = s.length;
-	return slen >= elen && s.substr(slen - elen,elen) == end;
-}
-StringTools.isSpace = function(s,pos) {
-	var c = s.charCodeAt(pos);
-	return c >= 9 && c <= 13 || c == 32;
-}
-StringTools.ltrim = function(s) {
-	var l = s.length;
-	var r = 0;
-	while(r < l && StringTools.isSpace(s,r)) r++;
-	if(r > 0) return s.substr(r,l - r); else return s;
-}
-StringTools.rtrim = function(s) {
-	var l = s.length;
-	var r = 0;
-	while(r < l && StringTools.isSpace(s,l - r - 1)) r++;
-	if(r > 0) return s.substr(0,l - r); else return s;
-}
-StringTools.trim = function(s) {
-	return StringTools.ltrim(StringTools.rtrim(s));
-}
-StringTools.rpad = function(s,c,l) {
-	var sl = s.length;
-	var cl = c.length;
-	while(sl < l) if(l - sl < cl) {
-		s += c.substr(0,l - sl);
-		sl = l;
-	} else {
-		s += c;
-		sl += cl;
-	}
-	return s;
-}
-StringTools.lpad = function(s,c,l) {
-	var ns = "";
-	var sl = s.length;
-	if(sl >= l) return s;
-	var cl = c.length;
-	while(sl < l) if(l - sl < cl) {
-		ns += c.substr(0,l - sl);
-		sl = l;
-	} else {
-		ns += c;
-		sl += cl;
-	}
-	return ns + s;
-}
-StringTools.replace = function(s,sub,by) {
-	return s.split(sub).join(by);
-}
-StringTools.hex = function(n,digits) {
-	var s = "";
-	var hexChars = "0123456789ABCDEF";
-	do {
-		s = hexChars.charAt(n & 15) + s;
-		n >>>= 4;
-	} while(n > 0);
-	if(digits != null) while(s.length < digits) s = "0" + s;
-	return s;
-}
-StringTools.fastCodeAt = function(s,index) {
-	return s.cca(index);
-}
-StringTools.isEOF = function(c) {
-	return c != c;
-}
-StringTools.prototype.__class__ = StringTools;
-haxe.unit.TestResult = function(p) {
-	if( p === $_ ) return;
-	this.m_tests = new List();
-	this.success = true;
-}
-haxe.unit.TestResult.__name__ = ["haxe","unit","TestResult"];
-haxe.unit.TestResult.prototype.m_tests = null;
-haxe.unit.TestResult.prototype.success = null;
-haxe.unit.TestResult.prototype.add = function(t) {
-	this.m_tests.add(t);
-	if(!t.success) this.success = false;
-}
-haxe.unit.TestResult.prototype.toString = function() {
-	var buf = new StringBuf();
-	var failures = 0;
-	var $it0 = this.m_tests.iterator();
-	while( $it0.hasNext() ) {
-		var test = $it0.next();
-		if(test.success == false) {
-			buf.b[buf.b.length] = "* " == null?"null":"* ";
-			buf.add(test.classname);
-			buf.b[buf.b.length] = "::" == null?"null":"::";
-			buf.add(test.method);
-			buf.b[buf.b.length] = "()" == null?"null":"()";
-			buf.b[buf.b.length] = "\n" == null?"null":"\n";
-			buf.b[buf.b.length] = "ERR: " == null?"null":"ERR: ";
-			if(test.posInfos != null) {
-				buf.add(test.posInfos.fileName);
-				buf.b[buf.b.length] = ":" == null?"null":":";
-				buf.add(test.posInfos.lineNumber);
-				buf.b[buf.b.length] = "(" == null?"null":"(";
-				buf.add(test.posInfos.className);
-				buf.b[buf.b.length] = "." == null?"null":".";
-				buf.add(test.posInfos.methodName);
-				buf.b[buf.b.length] = ") - " == null?"null":") - ";
-			}
-			buf.add(test.error);
-			buf.b[buf.b.length] = "\n" == null?"null":"\n";
-			if(test.backtrace != null) {
-				buf.add(test.backtrace);
-				buf.b[buf.b.length] = "\n" == null?"null":"\n";
-			}
-			buf.b[buf.b.length] = "\n" == null?"null":"\n";
-			failures++;
-		}
-	}
-	buf.b[buf.b.length] = "\n" == null?"null":"\n";
-	if(failures == 0) buf.b[buf.b.length] = "OK " == null?"null":"OK "; else buf.b[buf.b.length] = "FAILED " == null?"null":"FAILED ";
-	buf.add(this.m_tests.length);
-	buf.b[buf.b.length] = " tests, " == null?"null":" tests, ";
-	buf.b[buf.b.length] = failures == null?"null":failures;
-	buf.b[buf.b.length] = " failed, " == null?"null":" failed, ";
-	buf.add(this.m_tests.length - failures);
-	buf.b[buf.b.length] = " success" == null?"null":" success";
-	buf.b[buf.b.length] = "\n" == null?"null":"\n";
-	return buf.b.join("");
-}
-haxe.unit.TestResult.prototype.__class__ = haxe.unit.TestResult;
-Reflect = function() { }
-Reflect.__name__ = ["Reflect"];
-Reflect.hasField = function(o,field) {
-	if(o.hasOwnProperty != null) return o.hasOwnProperty(field);
-	var arr = Reflect.fields(o);
-	var $it0 = arr.iterator();
-	while( $it0.hasNext() ) {
-		var t = $it0.next();
-		if(t == field) return true;
-	}
-	return false;
-}
-Reflect.field = function(o,field) {
-	var v = null;
-	try {
-		v = o[field];
-	} catch( e ) {
-	}
-	return v;
-}
-Reflect.setField = function(o,field,value) {
-	o[field] = value;
-}
-Reflect.callMethod = function(o,func,args) {
-	return func.apply(o,args);
-}
-Reflect.fields = function(o) {
-	if(o == null) return new Array();
-	var a = new Array();
-	if(o.hasOwnProperty) {
-		for(var i in o) if( o.hasOwnProperty(i) ) a.push(i);
-	} else {
-		var t;
-		try {
-			t = o.__proto__;
-		} catch( e ) {
-			t = null;
-		}
-		if(t != null) o.__proto__ = null;
-		for(var i in o) if( i != "__proto__" ) a.push(i);
-		if(t != null) o.__proto__ = t;
-	}
-	return a;
-}
-Reflect.isFunction = function(f) {
-	return typeof(f) == "function" && f.__name__ == null;
-}
-Reflect.compare = function(a,b) {
-	return a == b?0:a > b?1:-1;
-}
-Reflect.compareMethods = function(f1,f2) {
-	if(f1 == f2) return true;
-	if(!Reflect.isFunction(f1) || !Reflect.isFunction(f2)) return false;
-	return f1.scope == f2.scope && f1.method == f2.method && f1.method != null;
-}
-Reflect.isObject = function(v) {
-	if(v == null) return false;
-	var t = typeof(v);
-	return t == "string" || t == "object" && !v.__enum__ || t == "function" && v.__name__ != null;
-}
-Reflect.deleteField = function(o,f) {
-	if(!Reflect.hasField(o,f)) return false;
-	delete(o[f]);
-	return true;
-}
-Reflect.copy = function(o) {
-	var o2 = { };
-	var _g = 0, _g1 = Reflect.fields(o);
-	while(_g < _g1.length) {
-		var f = _g1[_g];
-		++_g;
-		o2[f] = Reflect.field(o,f);
-	}
-	return o2;
-}
-Reflect.makeVarArgs = function(f) {
-	return function() {
-		var a = new Array();
-		var _g1 = 0, _g = arguments.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			a.push(arguments[i]);
-		}
-		return f(a);
-	};
-}
-Reflect.prototype.__class__ = Reflect;
-haxe.Log = function() { }
-haxe.Log.__name__ = ["haxe","Log"];
-haxe.Log.trace = function(v,infos) {
-	js.Boot.__trace(v,infos);
-}
-haxe.Log.clear = function() {
-	js.Boot.__clear_trace();
-}
-haxe.Log.prototype.__class__ = haxe.Log;
-gamespec.GameStateSpec = function(p) {
-	if( p === $_ ) return;
-	haxespec.FuryTestCase.call(this);
-}
-gamespec.GameStateSpec.__name__ = ["gamespec","GameStateSpec"];
-gamespec.GameStateSpec.__super__ = haxespec.FuryTestCase;
-for(var k in haxespec.FuryTestCase.prototype ) gamespec.GameStateSpec.prototype[k] = haxespec.FuryTestCase.prototype[k];
-gamespec.GameStateSpec.prototype.gamestate = null;
-gamespec.GameStateSpec.prototype.setup = function() {
-	this.gamestate = new game.GameState();
-	var _g = 0;
-	while(_g < 26) {
-		var k = _g++;
-		this.gamestate.Set(k + "",k);
-	}
-}
-gamespec.GameStateSpec.prototype.tearDown = function() {
-	this.gamestate = null;
-}
-gamespec.GameStateSpec.prototype.testSetup = function() {
-	var _g = 0;
-	while(_g < 26) {
-		var k = _g++;
-		this.assertTrue(this.gamestate.Exists(k + ""),{ fileName : "GameStateSpec.hx", lineNumber : 23, className : "gamespec.GameStateSpec", methodName : "testSetup"});
-		this.assertEquals(this.gamestate.Get(k + ""),k,{ fileName : "GameStateSpec.hx", lineNumber : 24, className : "gamespec.GameStateSpec", methodName : "testSetup"});
-	}
-}
-gamespec.GameStateSpec.prototype.testGameStateModification = function() {
-	var flag = false;
-	dispatch.EventCannon.Listen(gamedata.GameStateDataChangedEvent.Name,function(e) {
-		flag = true;
-	});
-	this.assertFalse(flag,{ fileName : "GameStateSpec.hx", lineNumber : 33, className : "gamespec.GameStateSpec", methodName : "testGameStateModification"});
-	this.gamestate.Modify("0",14);
-	this.assertTrue(flag,{ fileName : "GameStateSpec.hx", lineNumber : 35, className : "gamespec.GameStateSpec", methodName : "testGameStateModification"});
-}
-gamespec.GameStateSpec.prototype.__class__ = gamespec.GameStateSpec;
-gamespec.GameSpec = function(p) {
-	if( p === $_ ) return;
-	haxespec.FuryTestCase.call(this);
-}
-gamespec.GameSpec.__name__ = ["gamespec","GameSpec"];
-gamespec.GameSpec.__super__ = haxespec.FuryTestCase;
-for(var k in haxespec.FuryTestCase.prototype ) gamespec.GameSpec.prototype[k] = haxespec.FuryTestCase.prototype[k];
-gamespec.GameSpec.prototype.game = null;
-gamespec.GameSpec.prototype.setup = function() {
-	this.game = new gamespec.GameSpecTestGame();
-}
-gamespec.GameSpec.prototype.tearDown = function() {
-}
-gamespec.GameSpec.prototype.testGame = function() {
-	this.game.Start();
-}
-gamespec.GameSpec.prototype.__class__ = gamespec.GameSpec;
-buildingblocks.CoreObject = function(p) {
-	if( p === $_ ) return;
-	this.core_object_id = buildingblocks.CoreObject.Count;
-	buildingblocks.CoreObject.Count += 1;
-	this.delegate_hash = new Hash();
-}
-buildingblocks.CoreObject.__name__ = ["buildingblocks","CoreObject"];
-buildingblocks.CoreObject.prototype.core_object_id = null;
-buildingblocks.CoreObject.prototype.delegate_hash = null;
-buildingblocks.CoreObject.prototype.Listen4 = function(eventname,callb) {
-	if(this.delegate_hash.exists(eventname)) this.delegate_hash.set(eventname,[function(e) {
-		haxe.Log.trace(e,{ fileName : "CoreObject.hx", lineNumber : 19, className : "buildingblocks.CoreObject", methodName : "Listen4"});
-	}]);
-	this.delegate_hash.get(eventname).push(callb);
-}
-buildingblocks.CoreObject.prototype.Destroy = function() {
-	dispatch.EventLaser.Unregister(this);
-	buildingblocks.CoreObject.Count -= 1;
-}
-buildingblocks.CoreObject.prototype.Core_Object_Id = function() {
-	return this.core_object_id;
-}
-buildingblocks.CoreObject.prototype.__class__ = buildingblocks.CoreObject;
-if(typeof game=='undefined') game = {}
-game.Game = function(p) {
-	if( p === $_ ) return;
-	var me = this;
-	buildingblocks.CoreObject.call(this);
-	this.game_state = new game.GameState();
-	this.logic_manager = new game.Logic();
-	this.logic_manager.CurrentState(this.game_state);
-	this.interaction_manager = new game.Interaction();
-	this.game_renderer = new game.Renderer(this.game_state);
-	this.game_objects = [];
-	dispatch.EventCannon.Listen(gamedata.GameFinishEvent.Name,function(e) {
-		me.Finish(e);
-	});
-}
-game.Game.__name__ = ["game","Game"];
-game.Game.__super__ = buildingblocks.CoreObject;
-for(var k in buildingblocks.CoreObject.prototype ) game.Game.prototype[k] = buildingblocks.CoreObject.prototype[k];
-game.Game.prototype.interaction_manager = null;
-game.Game.prototype.logic_manager = null;
-game.Game.prototype.game_renderer = null;
-game.Game.prototype.game_state = null;
-game.Game.prototype.game_objects = null;
-game.Game.prototype.GameState = function() {
-	return this.game_state;
-}
-game.Game.prototype.Start = function() {
-	this.game_renderer.Draw();
-	this.game_state.Set("started",true);
-}
-game.Game.prototype.Finish = function(event) {
-	this.game_state.Set("started",false);
-}
-game.Game.prototype.__class__ = game.Game;
-gamespec.GameSpecTestGame = function(p) {
-	if( p === $_ ) return;
-	var me = this;
-	game.Game.call(this);
-	this.game_renderer = new gamespec.GameSpecTestRenderer(this.game_state);
-	this.game_state.Set("number",0);
-	this.game_state.Set("attempts",0);
-	this.game_state.Set("win",false);
-	var btn = new game.GameObject(specfactory.GameFactory.GameObjectData());
-	btn.Register(this.game_state);
-	this.game_objects.push(new game.GameObject());
-	this.interaction_manager.Register("mouseclick",function(e) {
-		if(tools.Measure.PointInBox({ x : e.pageX + 0.0, y : e.pageY + 0.0},btn.Position(),btn.Size())) {
-			var num = me.game_state.Get("number");
-			me.game_state.Modify("number",num + tools.Random.OneOf([-1,1]));
-		}
-		me.logic_manager.Step();
-	});
-	this.logic_manager.AddRule(function(g) {
-		if(g.Get("win") == true) dispatch.EventCannon.Fire(new gamedata.GameFinishEvent(true,10));
-	});
-	this.logic_manager.AddRule(function(g) {
-		if(g.Get("number") == 10) g.Set("win",true);
-	});
-}
-gamespec.GameSpecTestGame.__name__ = ["gamespec","GameSpecTestGame"];
-gamespec.GameSpecTestGame.__super__ = game.Game;
-for(var k in game.Game.prototype ) gamespec.GameSpecTestGame.prototype[k] = game.Game.prototype[k];
-gamespec.GameSpecTestGame.prototype.__class__ = gamespec.GameSpecTestGame;
-game.Renderer = function(state) {
-	if( state === $_ ) return;
-	var me = this;
-	buildingblocks.CoreObject.call(this);
-	this.gameobjects = [];
-	this.gamestate = state;
-	dispatch.EventCannon.Listen(gamedata.GameStateDataChangedEvent.Name,function(e) {
-		me.p_processgamestate(e);
-	});
-	dispatch.EventCannon.Listen(gamedata.GameObjectCreatedEvent.Name,function(e) {
-		me.Register(e.gameobject);
-	});
-}
-game.Renderer.__name__ = ["game","Renderer"];
-game.Renderer.__super__ = buildingblocks.CoreObject;
-for(var k in buildingblocks.CoreObject.prototype ) game.Renderer.prototype[k] = buildingblocks.CoreObject.prototype[k];
-game.Renderer.prototype.gameobjects = null;
-game.Renderer.prototype.gamestate = null;
-game.Renderer.prototype.Draw = function() {
-	buildingblocks.Canvas.Draw();
-}
-game.Renderer.prototype.Register = function(gameobject) {
-	this.gameobjects.push(gameobject);
-}
-game.Renderer.prototype.Remove = function(gameobject) {
-	return this.gameobjects.remove(gameobject);
-}
-game.Renderer.prototype.p_processgamestate = function(event) {
-	throw "Not Implemented Error : Please do not try to implement abstract classes";
-}
-game.Renderer.prototype.__class__ = game.Renderer;
-gamespec.GameSpecTestRenderer = function(g) {
-	if( g === $_ ) return;
-	game.Renderer.call(this,g);
-	var scr_data = specfactory.BuildingBlocksFactory.TextData();
-	scr_data.raw_text = g.Get("number") + "";
-	scr_data.position = { x : 50.0, y : 50.0};
-}
-gamespec.GameSpecTestRenderer.__name__ = ["gamespec","GameSpecTestRenderer"];
-gamespec.GameSpecTestRenderer.__super__ = game.Renderer;
-for(var k in game.Renderer.prototype ) gamespec.GameSpecTestRenderer.prototype[k] = game.Renderer.prototype[k];
-gamespec.GameSpecTestRenderer.prototype.text = null;
-gamespec.GameSpecTestRenderer.prototype.score = null;
-gamespec.GameSpecTestRenderer.prototype.Register = function(gameobject) {
-	game.Renderer.prototype.Register.call(this,gameobject);
-	var txt_data = specfactory.BuildingBlocksFactory.TextData();
-	txt_data.raw_text = "Faggot";
-	txt_data.position = gameobject.Position();
-	this.text = new buildingblocks.Text(txt_data);
-}
-gamespec.GameSpecTestRenderer.prototype.p_processgamestate = function(event) {
-	if(event.key == this.gameobjects[0].Id()) this.text.Position(this.gameobjects[0].Position());
-	if(event.key == "number") this.score.Text(event.value + "");
-}
-gamespec.GameSpecTestRenderer.prototype.__class__ = gamespec.GameSpecTestRenderer;
-game.Logic = function(p) {
-	if( p === $_ ) return;
-	buildingblocks.CoreObject.call(this);
-	this.rules = [];
-	this.metarules = [];
-}
-game.Logic.__name__ = ["game","Logic"];
-game.Logic.__super__ = buildingblocks.CoreObject;
-for(var k in buildingblocks.CoreObject.prototype ) game.Logic.prototype[k] = buildingblocks.CoreObject.prototype[k];
-game.Logic.prototype.rules = null;
-game.Logic.prototype.metarules = null;
-game.Logic.prototype.current_state = null;
-game.Logic.prototype.CurrentState = function(state) {
-	if(state != null) this.current_state = state;
-	return this.current_state;
-}
-game.Logic.prototype.Rules = function() {
-	return this.rules;
-}
-game.Logic.prototype.AddRule = function(rule) {
-	this.rules.push(rule);
-	return this.rules.length - 1;
-}
-game.Logic.prototype.MetaRules = function() {
-	return this.metarules;
-}
-game.Logic.prototype.AddMetaRule = function(metarule) {
-	this.metarules.push(metarule);
-	return this.metarules.length - 1;
-}
-game.Logic.prototype.Step = function(gamestate) {
-	this.CurrentState(gamestate);
-	var _g = 0, _g1 = this.metarules;
-	while(_g < _g1.length) {
-		var metarule = _g1[_g];
-		++_g;
-		metarule(this);
-	}
-	var _g = 0, _g1 = this.rules;
-	while(_g < _g1.length) {
-		var rule = _g1[_g];
-		++_g;
-		rule(this.current_state);
-	}
-}
-game.Logic.prototype.__class__ = game.Logic;
-StringBuf = function(p) {
-	if( p === $_ ) return;
-	this.b = new Array();
-}
-StringBuf.__name__ = ["StringBuf"];
-StringBuf.prototype.add = function(x) {
-	this.b[this.b.length] = x == null?"null":x;
-}
-StringBuf.prototype.addSub = function(s,pos,len) {
-	this.b[this.b.length] = s.substr(pos,len);
-}
-StringBuf.prototype.addChar = function(c) {
-	this.b[this.b.length] = String.fromCharCode(c);
-}
-StringBuf.prototype.toString = function() {
-	return this.b.join("");
-}
-StringBuf.prototype.b = null;
-StringBuf.prototype.__class__ = StringBuf;
-if(typeof furytest=='undefined') furytest = {}
-furytest.GameTest = function() { }
-furytest.GameTest.__name__ = ["furytest","GameTest"];
-furytest.GameTest.main = function() {
-	var runner = new haxe.unit.TestRunner();
-	runner.add(new gamespec.LogicSpec());
-	runner.add(new gamespec.GameStateSpec());
-	runner.add(new gamespec.InteractionSpec());
-	runner.add(new gamespec.RendererSpec());
-	runner.add(new gamespec.GameSpec());
-	runner.add(new gamespec.GameObjectSpec());
-	runner.run();
-}
-furytest.GameTest.prototype.__class__ = furytest.GameTest;
-if(typeof specfactory=='undefined') specfactory = {}
-specfactory.GameFactory = function() { }
-specfactory.GameFactory.__name__ = ["specfactory","GameFactory"];
-specfactory.GameFactory.GameObjectData = function() {
-	var size = specfactory.GameFactory.GameObjectSize();
-	var position = specfactory.GameFactory.GameObjectPosition();
-	var g = { size : size, position : position, angle : tools.Random.Angle(), id : "0"};
-	return g;
-}
-specfactory.GameFactory.GameObjectSize = function() {
-	var s = { width : 10.0 + tools.Random.Number(10), height : 10.0 + tools.Random.Number(10)};
-	return s;
-}
-specfactory.GameFactory.GameObjectPosition = function() {
-	var p = { x : tools.Random.Number(50) + 0.0, y : tools.Random.Number(50) + 0.0};
-	return p;
-}
-specfactory.GameFactory.prototype.__class__ = specfactory.GameFactory;
-gamespec.GameObjectSpec = function(p) {
-	if( p === $_ ) return;
-	haxespec.FuryTestCase.call(this);
-}
-gamespec.GameObjectSpec.__name__ = ["gamespec","GameObjectSpec"];
-gamespec.GameObjectSpec.__super__ = haxespec.FuryTestCase;
-for(var k in haxespec.FuryTestCase.prototype ) gamespec.GameObjectSpec.prototype[k] = haxespec.FuryTestCase.prototype[k];
-gamespec.GameObjectSpec.prototype.gameobject = null;
-gamespec.GameObjectSpec.prototype.gamestate = null;
-gamespec.GameObjectSpec.prototype.original_gameobjectdata = null;
-gamespec.GameObjectSpec.prototype.modified_gameobjectdata = null;
-gamespec.GameObjectSpec.prototype.event_gameobject_flag = null;
-gamespec.GameObjectSpec.prototype.original_gameobject_id = null;
-gamespec.GameObjectSpec.prototype.gameobjectdata_id_modified = null;
-gamespec.GameObjectSpec.prototype.setup = function() {
-	var me = this;
-	dispatch.EventCannon.Listen(gamedata.GameObjectCreatedEvent.Name,function(e) {
-		if(e.gameobject != null) me.event_gameobject_flag = true;
-	});
-	this.event_gameobject_flag = false;
-	this.original_gameobjectdata = specfactory.GameFactory.GameObjectData();
-	var a = this.original_gameobjectdata.id;
-	this.gameobjectdata_id_modified = false;
-	this.modified_gameobjectdata = specfactory.GameFactory.GameObjectData();
-	this.gamestate = new game.GameState();
-	this.gameobject = new game.GameObject(this.original_gameobjectdata);
-	if(a != this.original_gameobjectdata.id) this.gameobjectdata_id_modified = true;
-	this.original_gameobject_id = this.gameobject.Id();
-	this.gamestate.Set(this.gameobject.Id(),this.gameobject.ObjectData());
-}
-gamespec.GameObjectSpec.prototype.tearDown = function() {
-}
-gamespec.GameObjectSpec.prototype.testPosition = function() {
-	this.gameobject.Register(this.gamestate);
-	var p = specfactory.GameFactory.GameObjectPosition();
-	this.assertDifferent(this.gameobject.Position(),p,{ fileName : "GameObjectSpec.hx", lineNumber : 44, className : "gamespec.GameObjectSpec", methodName : "testPosition"});
-	this.assertDifferent(this.gamestate.Get(this.gameobject.Id()).position,p,{ fileName : "GameObjectSpec.hx", lineNumber : 45, className : "gamespec.GameObjectSpec", methodName : "testPosition"});
-	this.gameobject.Position(p);
-	this.assertEquals(this.gamestate.Get(this.gameobject.Id()).position,p,{ fileName : "GameObjectSpec.hx", lineNumber : 47, className : "gamespec.GameObjectSpec", methodName : "testPosition"});
-	this.assertEquals(this.gameobject.Position(),p,{ fileName : "GameObjectSpec.hx", lineNumber : 48, className : "gamespec.GameObjectSpec", methodName : "testPosition"});
-}
-gamespec.GameObjectSpec.prototype.testSize = function() {
-	this.gameobject.Register(this.gamestate);
-	var s = specfactory.GameFactory.GameObjectSize();
-	this.assertDifferent(this.gamestate.Get(this.gameobject.Id()).size,s,{ fileName : "GameObjectSpec.hx", lineNumber : 53, className : "gamespec.GameObjectSpec", methodName : "testSize"});
-	this.assertDifferent(this.gameobject.Size(),s,{ fileName : "GameObjectSpec.hx", lineNumber : 54, className : "gamespec.GameObjectSpec", methodName : "testSize"});
-	this.gameobject.Size(s);
-	this.assertEquals(this.gamestate.Get(this.gameobject.Id()).size,s,{ fileName : "GameObjectSpec.hx", lineNumber : 56, className : "gamespec.GameObjectSpec", methodName : "testSize"});
-	this.assertEquals(this.gameobject.Size(),s,{ fileName : "GameObjectSpec.hx", lineNumber : 57, className : "gamespec.GameObjectSpec", methodName : "testSize"});
-}
-gamespec.GameObjectSpec.prototype.testAngle = function() {
-	this.gameobject.Register(this.gamestate);
-	var a = tools.Random.Number(100) + 0.0;
-	this.assertDifferent(this.gamestate.Get(this.gameobject.Id()).angle,a,{ fileName : "GameObjectSpec.hx", lineNumber : 62, className : "gamespec.GameObjectSpec", methodName : "testAngle"});
-	this.assertDifferent(this.gameobject.Angle(),a,{ fileName : "GameObjectSpec.hx", lineNumber : 63, className : "gamespec.GameObjectSpec", methodName : "testAngle"});
-	this.gameobject.Angle(a);
-	this.assertEquals(this.gamestate.Get(this.gameobject.Id()).angle,a,{ fileName : "GameObjectSpec.hx", lineNumber : 65, className : "gamespec.GameObjectSpec", methodName : "testAngle"});
-	this.assertEquals(this.gameobject.Angle(),a,{ fileName : "GameObjectSpec.hx", lineNumber : 66, className : "gamespec.GameObjectSpec", methodName : "testAngle"});
-}
-gamespec.GameObjectSpec.prototype.testSetup = function() {
-	this.assertTrue(this.gameobjectdata_id_modified,{ fileName : "GameObjectSpec.hx", lineNumber : 70, className : "gamespec.GameObjectSpec", methodName : "testSetup"});
-	this.assertDifferent(this.original_gameobjectdata,this.modified_gameobjectdata,{ fileName : "GameObjectSpec.hx", lineNumber : 73, className : "gamespec.GameObjectSpec", methodName : "testSetup"});
-	this.gamestate.Modify(this.gameobject.Id(),this.modified_gameobjectdata);
-	this.assertEquals(this.gameobject.Angle(),this.modified_gameobjectdata.angle,{ fileName : "GameObjectSpec.hx", lineNumber : 79, className : "gamespec.GameObjectSpec", methodName : "testSetup"});
-	this.assertEquals(this.gameobject.Position(),this.modified_gameobjectdata.position,{ fileName : "GameObjectSpec.hx", lineNumber : 80, className : "gamespec.GameObjectSpec", methodName : "testSetup"});
-	this.assertEquals(this.gameobject.Size(),this.modified_gameobjectdata.size,{ fileName : "GameObjectSpec.hx", lineNumber : 81, className : "gamespec.GameObjectSpec", methodName : "testSetup"});
-	this.assertDifferent(this.gameobject.Id(),this.modified_gameobjectdata.id,{ fileName : "GameObjectSpec.hx", lineNumber : 84, className : "gamespec.GameObjectSpec", methodName : "testSetup"});
-	var lolcat = this.gamestate.Get(this.gameobject.Id());
-	lolcat.angle = 10.0;
-	this.assertDifferent(this.gameobject.Angle(),10.0,{ fileName : "GameObjectSpec.hx", lineNumber : 89, className : "gamespec.GameObjectSpec", methodName : "testSetup"});
-}
-gamespec.GameObjectSpec.prototype.__class__ = gamespec.GameObjectSpec;
-game.GameObject = function(objdata) {
-	if( objdata === $_ ) return;
-	var me = this;
-	this.objectdata = { size : { width : 0.0, height : 0.0}, position : { x : 0.0, y : 0.0}, angle : 0.0, id : game.GameObject.Name + game.GameObject.Count};
-	game.GameObject.Count += 1;
-	if(objdata != null) {
-		this.objectdata.size = objdata.size;
-		this.objectdata.position = objdata.position;
-		this.objectdata.angle = objdata.angle;
-		objdata.id = this.objectdata.id;
-	}
-	dispatch.EventCannon.Fire(new gamedata.GameObjectCreatedEvent(this));
-	dispatch.EventCannon.Listen(gamedata.GameStateDataChangedEvent.Name,function(e) {
-		if(e.key == me.Id()) me.p_updateobjectdata(e.value);
-	});
-	this.registration_flag = false;
-}
-game.GameObject.__name__ = ["game","GameObject"];
-game.GameObject.prototype.objectdata = null;
-game.GameObject.prototype.position_callback = null;
-game.GameObject.prototype.size_callback = null;
-game.GameObject.prototype.angle_callback = null;
-game.GameObject.prototype.registration_flag = null;
-game.GameObject.prototype.Register = function(gamestate) {
-	gamestate.Set(this.Id(),this.ObjectData());
-	var g = gamestate.Get(this.Id());
-	this.position_callback = function(p) {
-		g.position = p;
-	};
-	this.size_callback = function(s) {
-		g.size = s;
-	};
-	this.angle_callback = function(a) {
-		g.angle = a;
-	};
-	this.registration_flag = true;
-}
-game.GameObject.prototype.Id = function() {
-	return this.objectdata.id;
-}
-game.GameObject.prototype.Position = function(p) {
-	if(this.registration_flag && p != null) this.position_callback(p);
-	return this.objectdata.position;
-}
-game.GameObject.prototype.Size = function(s) {
-	if(this.registration_flag && s != null) this.size_callback(s);
-	return this.objectdata.size;
-}
-game.GameObject.prototype.Angle = function(a) {
-	if(this.registration_flag && a != null) this.angle_callback(a);
-	return this.objectdata.angle;
-}
-game.GameObject.prototype.ObjectData = function() {
-	return this.objectdata;
-}
-game.GameObject.prototype.p_updateobjectdata = function(objdata) {
-	this.objectdata.angle = objdata.angle;
-	this.objectdata.position = objdata.position;
-	this.objectdata.size = objdata.size;
-}
-game.GameObject.prototype.__class__ = game.GameObject;
-game.Interaction = function(p) {
-	if( p === $_ ) return;
-	var me = this;
-	buildingblocks.CoreObject.call(this);
-	this.interactions = new Hash();
-	var canvas = new js.JQuery("canvas");
-	var body = new js.JQuery("body");
-	if(canvas == null || canvas.length == 0) throw "Canvas not found and I don't get paid enough to make one error.";
-	if(body == null || body.length == 0) throw "Body not found and I am not even going to bother with trying to create one.";
-	var _g = 0, _g1 = game.Interaction.Actions;
-	try {
-		while(_g < _g1.length) {
-			var action = _g1[_g];
-			++_g;
-			this.interactions.set(action,new Hash());
-			var lambda_callback = (function(a) {
-				return function(e) {
-					var $it0 = me.interactions.get(a).iterator();
-					while( $it0.hasNext() ) {
-						var cb = $it0.next();
-						cb(e);
-					}
-				};
-			})(action);
-			switch(action) {
-			case "keydown":
-				body.keydown(lambda_callback);
-				break;
-			case "keypress":
-				body.keypress(lambda_callback);
-				break;
-			case "keyup":
-				body.keyup(lambda_callback);
-				break;
-			case "mouseclick":
-				canvas.click(lambda_callback);
-				break;
-			case "mouseover":
-				canvas.mouseover(lambda_callback);
-				break;
-			case "mouseleave":
-				canvas.mouseleave(lambda_callback);
-				break;
-			case "mousemove":
-				canvas.mousemove(lambda_callback);
-				break;
-			default:
-				throw "Unrecognized action error : " + action;
-				throw "__break__";
-			}
-		}
-	} catch( e ) { if( e != "__break__" ) throw e; }
-}
-game.Interaction.__name__ = ["game","Interaction"];
-game.Interaction.__super__ = buildingblocks.CoreObject;
-for(var k in buildingblocks.CoreObject.prototype ) game.Interaction.prototype[k] = buildingblocks.CoreObject.prototype[k];
-game.Interaction.prototype.interactions = null;
-game.Interaction.prototype.Register = function(type,cb) {
-	if(this.interactions.exists(type)) {
-		var key = game.Interaction.ID + "-" + type;
-		this.interactions.get(type).set(key,cb);
-		game.Interaction.ID += 1;
-		return key;
-	}
-	throw "No such interaction key error on registration : try learning to spell, dumbass";
-	return null;
-}
-game.Interaction.prototype.Remove = function(type,key) {
-	if(this.interactions.exists(type)) {
-		if(this.interactions.get(type).remove(key)) return;
-		throw "No such interaction function to remove.";
-	}
-	throw "No such interaction key errror on removal : where did you learn to program? DeVry University?";
-	return null;
-}
-game.Interaction.prototype.__class__ = game.Interaction;
-gamespec.InteractionSpec = function(p) {
-	if( p === $_ ) return;
-	haxespec.FuryTestCase.call(this);
-}
-gamespec.InteractionSpec.__name__ = ["gamespec","InteractionSpec"];
-gamespec.InteractionSpec.__super__ = haxespec.FuryTestCase;
-for(var k in haxespec.FuryTestCase.prototype ) gamespec.InteractionSpec.prototype[k] = haxespec.FuryTestCase.prototype[k];
-gamespec.InteractionSpec.prototype.interaction = null;
-gamespec.InteractionSpec.prototype.flags = null;
-gamespec.InteractionSpec.prototype.setup = function() {
-	this.interaction = new game.Interaction();
-	this.flags = new Hash();
-	var _g = 0, _g1 = game.Interaction.Actions;
-	while(_g < _g1.length) {
-		var action = _g1[_g];
-		++_g;
-		this.flags.set(action,false);
-	}
-}
-gamespec.InteractionSpec.prototype.tearDown = function() {
-}
-gamespec.InteractionSpec.prototype.testInteraction = function() {
-	var me = this;
-	var count = game.Interaction.Actions.length;
-	var _g = 0, _g1 = game.Interaction.Actions;
-	while(_g < _g1.length) {
-		var action = _g1[_g];
-		++_g;
-		this.interaction.Register(action,(function(a) {
-			return function(e) {
-				if(!me.flags.exists(a)) {
-					haxe.Log.trace("Async Test : " + a + " Failed...",{ fileName : "InteractionSpec.hx", lineNumber : 25, className : "gamespec.InteractionSpec", methodName : "testInteraction"});
-					return;
-				}
-				if(me.flags.get(a) == true) return; else {
-					me.flags.set(a,true);
-					count -= 1;
-					haxe.Log.trace("Interaction async Test : " + a + " Passed..." + count + " interaction tests remaining.",{ fileName : "InteractionSpec.hx", lineNumber : 34, className : "gamespec.InteractionSpec", methodName : "testInteraction"});
-					if(count == 0) haxe.Log.trace("All interaction async tests passed!",{ fileName : "InteractionSpec.hx", lineNumber : 36, className : "gamespec.InteractionSpec", methodName : "testInteraction"});
-				}
-			};
-		})(action));
-	}
-	this.assertTrue(true,{ fileName : "InteractionSpec.hx", lineNumber : 41, className : "gamespec.InteractionSpec", methodName : "testInteraction"});
-	haxe.Log.trace("Your interactions are required to pass this test. Mouse the mouse around and hit the keyboard!",{ fileName : "InteractionSpec.hx", lineNumber : 42, className : "gamespec.InteractionSpec", methodName : "testInteraction"});
-}
-gamespec.InteractionSpec.prototype.__class__ = gamespec.InteractionSpec;
-gamespec.RendererSpec = function(p) {
-	if( p === $_ ) return;
-	haxespec.FuryTestCase.call(this);
-}
-gamespec.RendererSpec.__name__ = ["gamespec","RendererSpec"];
-gamespec.RendererSpec.__super__ = haxespec.FuryTestCase;
-for(var k in haxespec.FuryTestCase.prototype ) gamespec.RendererSpec.prototype[k] = haxespec.FuryTestCase.prototype[k];
-gamespec.RendererSpec.prototype.artist = null;
-gamespec.RendererSpec.prototype.gamestate = null;
-gamespec.RendererSpec.prototype.setup = function() {
-	this.gamestate = new game.GameState();
-	this.artist = new gamespec.TestRenderer(this.gamestate);
-	this.gamestate.Set("faggot",0);
-}
-gamespec.RendererSpec.prototype.tearDown = function() {
-	this.artist = null;
-}
-gamespec.RendererSpec.prototype.testInheritanceScheme = function() {
-	this.gamestate.Modify("faggot",11);
-	this.assertEquals(100,this.artist.testval,{ fileName : "RendererSpec.hx", lineNumber : 21, className : "gamespec.RendererSpec", methodName : "testInheritanceScheme"});
-	this.assertTrue(this.artist.testval != 0,{ fileName : "RendererSpec.hx", lineNumber : 22, className : "gamespec.RendererSpec", methodName : "testInheritanceScheme"});
-}
-gamespec.RendererSpec.prototype.__class__ = gamespec.RendererSpec;
-gamespec.TestRenderer = function(g) {
-	if( g === $_ ) return;
-	game.Renderer.call(this,g);
-	this.testval = 0;
-}
-gamespec.TestRenderer.__name__ = ["gamespec","TestRenderer"];
-gamespec.TestRenderer.__super__ = game.Renderer;
-for(var k in game.Renderer.prototype ) gamespec.TestRenderer.prototype[k] = game.Renderer.prototype[k];
-gamespec.TestRenderer.prototype.testval = null;
-gamespec.TestRenderer.prototype.p_processgamestate = function(e) {
-	this.testval = 100;
-}
-gamespec.TestRenderer.prototype.__class__ = gamespec.TestRenderer;
-Std = function() { }
-Std.__name__ = ["Std"];
-Std["is"] = function(v,t) {
-	return js.Boot.__instanceof(v,t);
-}
-Std.string = function(s) {
-	return js.Boot.__string_rec(s,"");
-}
-Std["int"] = function(x) {
-	if(x < 0) return Math.ceil(x);
-	return Math.floor(x);
-}
-Std.parseInt = function(x) {
-	var v = parseInt(x,10);
-	if(v == 0 && x.charCodeAt(1) == 120) v = parseInt(x);
-	if(isNaN(v)) return null;
-	return v;
-}
-Std.parseFloat = function(x) {
-	return parseFloat(x);
-}
-Std.random = function(x) {
-	return Math.floor(Math.random() * x);
-}
-Std.prototype.__class__ = Std;
 haxe.unit.TestRunner = function(p) {
 	if( p === $_ ) return;
 	this.result = new haxe.unit.TestResult();
@@ -1661,38 +1053,6 @@ haxe.unit.TestRunner.prototype.runCase = function(t) {
 	haxe.Log.trace = old;
 }
 haxe.unit.TestRunner.prototype.__class__ = haxe.unit.TestRunner;
-game.GameState = function(data) {
-	if( data === $_ ) return;
-	buildingblocks.CoreObject.call(this);
-	if(data != null) this.gamestate_data = data; else this.gamestate_data = new gamedata.GameStateData();
-}
-game.GameState.__name__ = ["game","GameState"];
-game.GameState.__super__ = buildingblocks.CoreObject;
-for(var k in buildingblocks.CoreObject.prototype ) game.GameState.prototype[k] = buildingblocks.CoreObject.prototype[k];
-game.GameState.prototype.gamestate_data = null;
-game.GameState.prototype.GameState = function() {
-	return this.gamestate_data;
-}
-game.GameState.prototype.Hashify = function() {
-	return null;
-}
-game.GameState.prototype.Get = function(key) {
-	return this.gamestate_data.Get(key);
-}
-game.GameState.prototype.Modify = function(key,value) {
-	if(this.gamestate_data.Exists(key)) {
-		this.gamestate_data.Set(key,value);
-		dispatch.EventCannon.Fire(new gamedata.GameStateDataChangedEvent(key,value));
-	}
-	return;
-}
-game.GameState.prototype.Set = function(key,value) {
-	this.gamestate_data.Set(key,value);
-}
-game.GameState.prototype.Exists = function(key) {
-	return this.gamestate_data.Exists(key);
-}
-game.GameState.prototype.__class__ = game.GameState;
 if(typeof js=='undefined') js = {}
 js.Lib = function() { }
 js.Lib.__name__ = ["js","Lib"];
@@ -2048,6 +1408,7 @@ js.Boot.__init = function() {
 	$closure = js.Boot.__closure;
 }
 js.Boot.prototype.__class__ = js.Boot;
+if(typeof specfactory=='undefined') specfactory = {}
 specfactory.BuildingBlocksFactory = function() { }
 specfactory.BuildingBlocksFactory.__name__ = ["specfactory","BuildingBlocksFactory"];
 specfactory.BuildingBlocksFactory.CanvasData = function() {
@@ -2062,61 +1423,13 @@ specfactory.BuildingBlocksFactory.Image = function() {
 specfactory.BuildingBlocksFactory.TextData = function() {
 	var color = "rgb(" + tools.Random.Number(256) + "," + tools.Random.Number(256) + "," + tools.Random.Number(256) + ")";
 	var outline = "rgb(" + tools.Random.Number(256) + "," + tools.Random.Number(256) + "," + tools.Random.Number(256) + ")";
-	var font = tools.Random.Number(100) + "px " + ["Arial","sans-serif","Times New Roman"][tools.Random.Number(3)];
-	return { raw_text : tools.Random.Text(25), text_font : font, text_color : color, outline_color : outline, align : ["start","end","left","right","center"][tools.Random.Number(5)], baseline : ["alphabetic","bottom","hanging","ideographic","middle","top"][tools.Random.Number(6)], position : { x : tools.Random.Number(100) + 0.0, y : tools.Random.Number(100) + 0.0}, angle : tools.Random.Number(360) / 180 * Math.PI, opacity : 1.0};
+	var font = ["Arial","sans-serif","Times New Roman"][tools.Random.Number(3)];
+	return { raw_text : tools.Random.Text(25), text_font : font, text_size : tools.Random.Number(100), text_color : color, outline_color : outline, align : ["start","end","left","right","center"][tools.Random.Number(5)], baseline : ["alphabetic","bottom","hanging","ideographic","middle","top"][tools.Random.Number(6)], position : { x : tools.Random.Number(100) + 0.0, y : tools.Random.Number(100) + 0.0}, angle : tools.Random.Number(360) / 180 * Math.PI, opacity : 1.0};
 }
 specfactory.BuildingBlocksFactory.Text = function() {
 	return new buildingblocks.Text(specfactory.BuildingBlocksFactory.TextData());
 }
 specfactory.BuildingBlocksFactory.prototype.__class__ = specfactory.BuildingBlocksFactory;
-gamedata.GameStateData = function(p) {
-	if( p === $_ ) return;
-	this.data = new Hash();
-}
-gamedata.GameStateData.__name__ = ["gamedata","GameStateData"];
-gamedata.GameStateData.prototype.data = null;
-gamedata.GameStateData.prototype.Set = function(key,value) {
-	this.data.set(key,value);
-}
-gamedata.GameStateData.prototype.Get = function(key) {
-	return this.data.get(key);
-}
-gamedata.GameStateData.prototype.Exists = function(key) {
-	return this.data.exists(key);
-}
-gamedata.GameStateData.prototype.__class__ = gamedata.GameStateData;
-gamedata.GameStateDataChangedEvent = function(key,value) {
-	if( key === $_ ) return;
-	dispatch.Event.call(this,gamedata.GameStateDataChangedEvent.Name,0);
-	this.key = key;
-	this.value = value;
-}
-gamedata.GameStateDataChangedEvent.__name__ = ["gamedata","GameStateDataChangedEvent"];
-gamedata.GameStateDataChangedEvent.__super__ = dispatch.Event;
-for(var k in dispatch.Event.prototype ) gamedata.GameStateDataChangedEvent.prototype[k] = dispatch.Event.prototype[k];
-gamedata.GameStateDataChangedEvent.prototype.key = null;
-gamedata.GameStateDataChangedEvent.prototype.value = null;
-gamedata.GameStateDataChangedEvent.prototype.__class__ = gamedata.GameStateDataChangedEvent;
-gamedata.GameStartEvent = function(p) {
-	if( p === $_ ) return;
-	dispatch.Event.call(this,gamedata.GameStartEvent.Name,0);
-}
-gamedata.GameStartEvent.__name__ = ["gamedata","GameStartEvent"];
-gamedata.GameStartEvent.__super__ = dispatch.Event;
-for(var k in dispatch.Event.prototype ) gamedata.GameStartEvent.prototype[k] = dispatch.Event.prototype[k];
-gamedata.GameStartEvent.prototype.__class__ = gamedata.GameStartEvent;
-gamedata.GameFinishEvent = function(win,score) {
-	if( win === $_ ) return;
-	dispatch.Event.call(this,gamedata.GameFinishEvent.Name,0);
-	this.victory = win;
-	this.score = score;
-}
-gamedata.GameFinishEvent.__name__ = ["gamedata","GameFinishEvent"];
-gamedata.GameFinishEvent.__super__ = dispatch.Event;
-for(var k in dispatch.Event.prototype ) gamedata.GameFinishEvent.prototype[k] = dispatch.Event.prototype[k];
-gamedata.GameFinishEvent.prototype.victory = null;
-gamedata.GameFinishEvent.prototype.score = null;
-gamedata.GameFinishEvent.prototype.__class__ = gamedata.GameFinishEvent;
 Hash = function(p) {
 	if( p === $_ ) return;
 	this.h = {}
@@ -2175,24 +1488,6 @@ Hash.prototype.toString = function() {
 	return s.b.join("");
 }
 Hash.prototype.__class__ = Hash;
-dispatch.EventCannon = function() { }
-dispatch.EventCannon.__name__ = ["dispatch","EventCannon"];
-dispatch.EventCannon.Listen = function(name,cb) {
-	if(!dispatch.EventCannon.event_storage.exists(name)) dispatch.EventCannon.event_storage.set(name,[function(e) {
-		haxe.Log.trace(e,{ fileName : "EventCannon.hx", lineNumber : 8, className : "dispatch.EventCannon", methodName : "Listen"});
-	}]);
-	dispatch.EventCannon.event_storage.get(name).push(cb);
-}
-dispatch.EventCannon.Fire = function(e) {
-	if(!dispatch.EventCannon.event_storage.exists(e.name)) return;
-	var _g = 0, _g1 = dispatch.EventCannon.event_storage.get(e.name);
-	while(_g < _g1.length) {
-		var handler = _g1[_g];
-		++_g;
-		handler(e);
-	}
-}
-dispatch.EventCannon.prototype.__class__ = dispatch.EventCannon;
 buildingblocks.Canvas = function() { }
 buildingblocks.Canvas.__name__ = ["buildingblocks","Canvas"];
 buildingblocks.Canvas.RegisterImage = function(img) {
@@ -2221,15 +1516,33 @@ buildingblocks.Canvas.RemoveText = function(txt) {
 	}
 	return false;
 }
+buildingblocks.Canvas.FuckYou = function() {
+	var angle = Math.PI / 16;
+	var a = { cos : Math.cos(angle), sin : Math.sin(angle)};
+	var $it0 = buildingblocks.Canvas.Texts.iterator();
+	while( $it0.hasNext() ) {
+		var text = $it0.next();
+		var t = text.Jsonify().raw_text;
+		var p = { x : 400.0, y : 300.0};
+		var width = buildingblocks.Canvas.Context.measureText(t).width;
+		var center = { x : p.x + width / 2, y : p.y + text.Jsonify().text_size / 2};
+		var shift = { x : (1 - a.cos) * center.x - a.sin * center.y, y : a.sin * center.x + (1 - a.cos) * center.y};
+		buildingblocks.Canvas.Context.rotate(angle);
+		buildingblocks.Canvas.Context.translate(-shift.x,-shift.y);
+		buildingblocks.Canvas.Context.fillStyle = text.Jsonify().text_color;
+		buildingblocks.Canvas.Context.strokeStyle = text.Jsonify().outline_color;
+		buildingblocks.Canvas.Context.font = text.Jsonify().text_size + "px " + text.Jsonify().text_font;
+		buildingblocks.Canvas.Context.fillText(t,p.x,p.y);
+		buildingblocks.Canvas.Context.strokeText(t,p.x,p.y);
+		buildingblocks.Canvas.Context.restore();
+	}
+}
 buildingblocks.Canvas.Draw = function() {
-	buildingblocks.Canvas.Self.setAttribute("width",buildingblocks.Canvas.Configuration.width + "px");
-	buildingblocks.Canvas.Self.setAttribute("height",buildingblocks.Canvas.Configuration.height + "px");
-	buildingblocks.Canvas.Self.style.border = "2px solid black";
-	buildingblocks.Canvas.Context.clearRect(0,0,buildingblocks.Canvas.Configuration.width,buildingblocks.Canvas.Configuration.height);
 	var ratio = buildingblocks.Canvas.Configuration.reference_width / buildingblocks.Canvas.Configuration.reference_height;
 	var width = buildingblocks.Canvas.Configuration.width;
 	var height = width / ratio;
 	var band_height = (buildingblocks.Canvas.Configuration.height - height) / 2;
+	buildingblocks.Canvas.Context.clearRect(0,band_height,width,height);
 	var lambda_converter = (function() {
 		return { Size : function(s) {
 			return { width : s.width / 100 * width, height : s.height / 100 * height};
@@ -2245,30 +1558,54 @@ buildingblocks.Canvas.Draw = function() {
 		var position = lambda_converter.Position(image.Jsonify().position);
 		var size = lambda_converter.Size(image.Jsonify().size);
 		var skew = { cos : Math.cos(image.Jsonify().angle), sin : Math.sin(image.Jsonify().angle)};
-		buildingblocks.Canvas.Context.setTransform(skew.cos,skew.sin,-skew.sin,skew.cos,0,0);
+		var center = { x : position.x + size.width / 2, y : position.y + size.height / 2};
+		var shift = { x : (1 - skew.cos) * center.x - skew.sin * center.y, y : skew.sin * center.x + (1 - skew.cos) * center.y};
+		buildingblocks.Canvas.Context.rotate(image.Jsonify().angle);
+		buildingblocks.Canvas.Context.translate(-shift.x,-shift.y);
 		buildingblocks.Canvas.Context.drawImage(image.Source(),source_position.x,source_position.y,source_size.width,source_size.height,position.x,position.y,size.width,size.height);
+		buildingblocks.Canvas.Context.restore();
+		buildingblocks.Canvas.Context.setTransform(1,0,0,1,0,0);
 	}
 	var $it1 = buildingblocks.Canvas.Texts.iterator();
 	while( $it1.hasNext() ) {
 		var text = $it1.next();
+		var t = text.Jsonify().raw_text;
+		var p = lambda_converter.Position(text.Jsonify().position);
+		var size = { width : buildingblocks.Canvas.Context.measureText(t).width, height : text.Jsonify().text_size};
 		var a = { cos : Math.cos(text.Jsonify().angle), sin : Math.sin(text.Jsonify().angle)};
-		buildingblocks.Canvas.Context.setTransform(a.cos,a.sin,-a.sin,a.cos,0,0);
+		var center = { x : p.x + size.width / 2, y : p.y + size.height / 2};
+		var shift = { x : (1 - a.cos) * center.x - a.sin * center.y, y : a.sin * center.x + (1 - a.cos) * center.y};
+		buildingblocks.Canvas.Context.rotate(text.Jsonify().angle);
+		buildingblocks.Canvas.Context.translate(-shift.x,-shift.y);
 		buildingblocks.Canvas.Context.textAlign = text.Jsonify().align;
 		buildingblocks.Canvas.Context.textBaseline = text.Jsonify().baseline;
 		buildingblocks.Canvas.Context.fillStyle = text.Jsonify().text_color;
 		buildingblocks.Canvas.Context.strokeStyle = text.Jsonify().outline_color;
-		buildingblocks.Canvas.Context.font = text.Jsonify().text_font;
-		var p = lambda_converter.Position(text.Jsonify().position);
-		var t = text.Jsonify().raw_text;
+		buildingblocks.Canvas.Context.font = text.Jsonify().text_size + "px " + text.Jsonify().text_font;
 		buildingblocks.Canvas.Context.fillText(t,p.x,p.y);
 		buildingblocks.Canvas.Context.strokeText(t,p.x,p.y);
+		buildingblocks.Canvas.Context.setTransform(1,0,0,1,0,0);
+		buildingblocks.Canvas.Context.restore();
 	}
-	buildingblocks.Canvas.Context.setTransform(1,0,0,1,0,0);
 	buildingblocks.Canvas.Context.fillStyle = "black";
 	buildingblocks.Canvas.Context.fillRect(0,0,width,band_height);
 	buildingblocks.Canvas.Context.fillRect(0,buildingblocks.Canvas.Configuration.height - band_height,width,band_height);
 }
 buildingblocks.Canvas.prototype.__class__ = buildingblocks.Canvas;
+haxe.unit.TestStatus = function(p) {
+	if( p === $_ ) return;
+	this.done = false;
+	this.success = false;
+}
+haxe.unit.TestStatus.__name__ = ["haxe","unit","TestStatus"];
+haxe.unit.TestStatus.prototype.done = null;
+haxe.unit.TestStatus.prototype.success = null;
+haxe.unit.TestStatus.prototype.error = null;
+haxe.unit.TestStatus.prototype.method = null;
+haxe.unit.TestStatus.prototype.classname = null;
+haxe.unit.TestStatus.prototype.posInfos = null;
+haxe.unit.TestStatus.prototype.backtrace = null;
+haxe.unit.TestStatus.prototype.__class__ = haxe.unit.TestStatus;
 buildingblocks.Text = function(data) {
 	if( data === $_ ) return;
 	buildingblocks.Element.call(this);
@@ -2298,6 +1635,10 @@ buildingblocks.Text.prototype.Position = function(p) {
 	if(p != null) this.text_data.position = p;
 	return this.text_data.position;
 }
+buildingblocks.Text.prototype.Angle = function(a) {
+	if(a != null) this.text_data.angle = a;
+	return this.text_data.angle;
+}
 buildingblocks.Text.prototype.Hide = function() {
 	if(this.index == null) return;
 	buildingblocks.Canvas.RemoveText(this);
@@ -2308,35 +1649,9 @@ buildingblocks.Text.prototype.Show = function() {
 	this.index = buildingblocks.Canvas.RegisterText(this);
 }
 buildingblocks.Text.prototype.__class__ = buildingblocks.Text;
-haxe.unit.TestStatus = function(p) {
-	if( p === $_ ) return;
-	this.done = false;
-	this.success = false;
-}
-haxe.unit.TestStatus.__name__ = ["haxe","unit","TestStatus"];
-haxe.unit.TestStatus.prototype.done = null;
-haxe.unit.TestStatus.prototype.success = null;
-haxe.unit.TestStatus.prototype.error = null;
-haxe.unit.TestStatus.prototype.method = null;
-haxe.unit.TestStatus.prototype.classname = null;
-haxe.unit.TestStatus.prototype.posInfos = null;
-haxe.unit.TestStatus.prototype.backtrace = null;
-haxe.unit.TestStatus.prototype.__class__ = haxe.unit.TestStatus;
 $_ = {}
 js.Boot.__res = {}
 js.Boot.__init();
-{
-	Math.__name__ = ["Math"];
-	Math.NaN = Number["NaN"];
-	Math.NEGATIVE_INFINITY = Number["NEGATIVE_INFINITY"];
-	Math.POSITIVE_INFINITY = Number["POSITIVE_INFINITY"];
-	Math.isFinite = function(i) {
-		return isFinite(i);
-	};
-	Math.isNaN = function(i) {
-		return isNaN(i);
-	};
-}
 {
 	/*!
  * jQuery JavaScript Library v1.5
@@ -2369,6 +1684,51 @@ js.Boot.__init();
 		}};
 	};
 }
+if(typeof(haxe_timers) == "undefined") haxe_timers = [];
+{
+	var d = Date;
+	d.now = function() {
+		return new Date();
+	};
+	d.fromTime = function(t) {
+		var d1 = new Date();
+		d1["setTime"](t);
+		return d1;
+	};
+	d.fromString = function(s) {
+		switch(s.length) {
+		case 8:
+			var k = s.split(":");
+			var d1 = new Date();
+			d1["setTime"](0);
+			d1["setUTCHours"](k[0]);
+			d1["setUTCMinutes"](k[1]);
+			d1["setUTCSeconds"](k[2]);
+			return d1;
+		case 10:
+			var k = s.split("-");
+			return new Date(k[0],k[1] - 1,k[2],0,0,0);
+		case 19:
+			var k = s.split(" ");
+			var y = k[0].split("-");
+			var t = k[1].split(":");
+			return new Date(y[0],y[1] - 1,y[2],t[0],t[1],t[2]);
+		default:
+			throw "Invalid date format : " + s;
+		}
+	};
+	d.prototype["toString"] = function() {
+		var date = this;
+		var m = date.getMonth() + 1;
+		var d1 = date.getDate();
+		var h = date.getHours();
+		var mi = date.getMinutes();
+		var s = date.getSeconds();
+		return date.getFullYear() + "-" + (m < 10?"0" + m:"" + m) + "-" + (d1 < 10?"0" + d1:"" + d1) + " " + (h < 10?"0" + h:"" + h) + ":" + (mi < 10?"0" + mi:"" + mi) + ":" + (s < 10?"0" + s:"" + s);
+	};
+	d.prototype.__class__ = d;
+	d.__name__ = ["Date"];
+}
 {
 	String.prototype.__class__ = String;
 	String.__name__ = ["String"];
@@ -2384,6 +1744,18 @@ js.Boot.__init();
 	Void = { __ename__ : ["Void"]};
 }
 {
+	Math.__name__ = ["Math"];
+	Math.NaN = Number["NaN"];
+	Math.NEGATIVE_INFINITY = Number["NEGATIVE_INFINITY"];
+	Math.POSITIVE_INFINITY = Number["POSITIVE_INFINITY"];
+	Math.isFinite = function(i) {
+		return isFinite(i);
+	};
+	Math.isNaN = function(i) {
+		return isNaN(i);
+	};
+}
+{
 	js.Lib.document = document;
 	js.Lib.window = window;
 	onerror = function(msg,url,line) {
@@ -2393,24 +1765,14 @@ js.Boot.__init();
 		return f(msg,[url+":"+line]);
 	}
 }
-gamedata.GameObjectCreatedEvent.Name = "Game Object Created Event " + tools.Random.Text(15);
-gamedata.GameObjectPositionEvent.Name = "Game Object Position Changed " + tools.Random.Text(20);
 buildingblocks.Element.Count = 0;
 buildingblocks.Element.Parent = (function() {
 	var jq = new js.JQuery("body");
 	if(jq == null) throw "Javascript Placement Error : This code must be placed in the <body> tags";
 	return jq;
 })();
-buildingblocks.CoreObject.Count = 0;
-game.GameObject.Name = "Furytile GameObject " + tools.Random.Text(15);
-game.GameObject.Count = 0;
-game.Interaction.ID = 0;
-game.Interaction.Actions = ["keydown","keypress","keyup","mouseclick","mouseover","mouseleave","mousemove"];
+tools.Stopwatch.TIME = haxe.Timer.stamp();
 js.Lib.onerror = null;
-gamedata.GameStateDataChangedEvent.Name = "game state data changed " + tools.Random.Text(15);
-gamedata.GameStartEvent.Name = "game started " + tools.Random.Text(15);
-gamedata.GameFinishEvent.Name = "game finished " + tools.Random.Text(15);
-dispatch.EventCannon.event_storage = new Hash();
 buildingblocks.Canvas.Images = new Hash();
 buildingblocks.Canvas.ImageCount = 0;
 buildingblocks.Canvas.Texts = new Hash();
@@ -2429,4 +1791,4 @@ buildingblocks.Canvas.Context = (function() {
 	}
 	return buildingblocks.Canvas.Self.getContext("2d");
 })();
-furytest.GameTest.main()
+furytest.BuildingBlocksIntegrationTest.main()

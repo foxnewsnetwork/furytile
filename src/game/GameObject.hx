@@ -4,8 +4,10 @@ import gamedata.GameStateData;
 import dispatch.EventCannon;
 import dispatch.EventLaser;
 import buildingblocks.CoreObject;
+import buildingblocks.Interaction;
+import gamedata.InteractionData;
 
-class GameObject {
+class GameObject extends CoreObject {
 	public static var Name = "Furytile GameObject " + tools.Random.Text(15);
 	public static var Count = 0;
 	private var objectdata : GameObjectData;
@@ -13,8 +15,11 @@ class GameObject {
 	private var size_callback : GameObjectSize -> Void;
 	private var angle_callback : Float -> Void;
 	private var registration_flag : Bool;
+	private var active_flag : Bool;
+	private var has_mouse_flag : Bool;
 	
 	public function new(?objdata : GameObjectData) { 
+		super();
 		this.objectdata = { 
 			size : { width : 0.0, height : 0.0 } ,
 			position : { x : 0.0, y : 0.0 },
@@ -35,9 +40,32 @@ class GameObject {
 			} // if
 		} ); // Listen
 		this.registration_flag = false;
+		this.active_flag = true;
+		this.has_mouse_flag = false;
+		Interaction.Register("mousemove", function(e) { 
+			if ( tools.Measure.PointInBox( { x : e.pageX+0.0, y : e.pageY+0.0 }, this.Position(), this.Size() ) )  { 
+				if ( this.has_mouse_flag == false ) {
+					this.has_mouse_flag = true;
+					var event = new MouseoverEvent( this.Core_Object_Id(), e );
+					event.type = "mouseover";
+					event.position = { x : e.pageX + 0.0, y : e.pageY + 0.0 };
+					EventLaser.Fire( event, this.Core_Object_Id() );
+				} // if has_mouse
+			} // if in box
+			else { 
+				if ( this.has_mouse_flag == true ) { 
+					this.has_mouse_flag = false;
+					var event = new MouseleaveEvent( this.Core_Object_Id(), e );
+					event.type = "mouseleave";
+					event.position = { x : e.pageX + 0.0, y : e.pageY + 0.0 };
+					EventLaser.Fire( event, this.Core_Object_Id() );
+				} // if has_mouse
+			} // else not in box
+		} ); // Register
 	} // new
 	
-	public function Register( gamestate : GameState ) { 
+	public function Register( gamestate : GameState ) {
+		gamestate.Set( this.Id(), this.ObjectData() ); 
 		var g : GameObjectData = gamestate.Get(this.Id());
 		this.position_callback = function( p ) { 
 			g.position = p;
@@ -48,6 +76,25 @@ class GameObject {
 		this.angle_callback = function(a) { g.angle = a; };
 		this.registration_flag = true;
 	} // Register
+	
+	/***
+	* Interaction Functions
+	*/
+	public function Bind( action : String, cb : js.JQuery.JqEvent->Void ) : Void { 
+		switch( action ) { 
+			case "mouseover" :
+				this.Listen4( MouseoverEvent.Name, function(e) { 
+					cb( e.ToJqEvent() );
+				} ); // listen4
+			case "mouseleave" :
+				this.Listen4( MouseleaveEvent.Name, function(e) { 
+					cb( e.ToJqEvent() );
+				} ); // listen4
+			default :
+				Interaction.Register( action, cb );
+		} // switch
+	} // bind
+	
 	/***
 	* Get Accessor Functions
 	*/

@@ -1,5 +1,5 @@
 package dispatch;
-
+import js.JQuery;
 class Event {
 	// Name of the event
 	public var name : String;
@@ -10,4 +10,6 @@ class Event {
 		this.name = name;
 		this.origin = origin;
 	} // new
+	
+	public function ToJqEvent() : JqEvent { return null; }
 } // Event
