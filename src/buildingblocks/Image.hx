@@ -23,11 +23,21 @@ class Image extends Element {
 		this.index = Canvas.RegisterImage( this );
 	} // new
 	
-	public function Angle( ?a : Float ) { 
+	public override function Angle( ?a : Float ) { 
 		if ( a != null )
 			this.image_data.angle = a;
 		return this.image_data.angle;
 	} // Angle
+	public override function Position( ?p : { x : Float, y : Float } ) { 
+		if ( p != null )
+			this.image_data.position = p;
+		return this.image_data.position;
+	} // Position
+	public override function Size( ?s : { width : Float, height : Float } ) { 
+		if ( s != null )
+			this.image_data.size = s;
+		return this.image_data.size;
+	} // Size
 	public function Jsonify() { 
 		return image_data;
 	} // Serialize	
@@ -49,4 +59,5 @@ class Image extends Element {
 		} // if
 		this.index = Canvas.RegisterImage(this);
 	} // Show
+		
 } // Image

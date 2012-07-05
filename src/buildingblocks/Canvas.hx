@@ -130,7 +130,9 @@ class Canvas {
 		})(); // lambda_converter
 		
 		// Step 2: Draw the images
-		for( image in Canvas.Images ) { 
+		for( image in Canvas.Images ) {
+			if( image.visible_flag == false )
+				return; 
 			var source_position = image.Jsonify().source_position;
 			var source_size = image.Jsonify().source_size;
 			var position = lambda_converter.Position( image.Jsonify().position  );
@@ -159,6 +161,9 @@ class Canvas {
 		
 		// Step 3: Draw the texts
 		for( text in Canvas.Texts ) {
+			if( text.visible_flag == false )
+				return;
+			
 			// Step aa : Extracting the data
 			var t = text.Jsonify().raw_text;
 			var p = lambda_converter.Position( text.Jsonify().position );

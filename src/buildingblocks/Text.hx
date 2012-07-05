@@ -32,13 +32,27 @@ class Text extends Element {
 		return this.text_data;
 	} // TextData
 	
-	public function Position( ?p : { x : Float, y : Float } ) { 
+	public override function Size( ?s : { width : Float, height : Float } ) { 
+		if ( s != null )
+			this.text_data.text_size = Math.floor( s.height );
+		var w : Float = Canvas.Context.measureText( this.text_data.raw_text ).width + 0.0; 
+		trace( { 
+			width : w , 
+			height : this.text_data.text_size + 0.0 
+		});
+		return { 
+			width : w , 
+			height : this.text_data.text_size + 0.0 
+		}; // return
+	} // Size
+	
+	public override function Position( ?p : { x : Float, y : Float } ) { 
 		if( p != null )
 			this.text_data.position = p;
 		return this.text_data.position;
 	} // Position
 	
-	public function Angle( ?a : Float ) { 
+	public override function Angle( ?a : Float ) { 
 		if ( a != null )
 			this.text_data.angle = a;
 		return this.text_data.angle;
