@@ -1,0 +1,5 @@
+package buildingblocksspec;
+
+class DivSpec {
+
+}

@@ -1,4 +1,58 @@
 $estr = function() { return js.Boot.__string_rec(this,''); }
+if(typeof furytest=='undefined') furytest = {}
+furytest.Game2Test = function() { }
+furytest.Game2Test.__name__ = ["furytest","Game2Test"];
+furytest.Game2Test.main = function() {
+	var runner = new haxe.unit.TestRunner();
+	runner.add(new game2spec.PlaygroundSpec());
+	runner.run();
+}
+furytest.Game2Test.prototype.__class__ = furytest.Game2Test;
+if(typeof game2=='undefined') game2 = {}
+game2.Playground = function(p) {
+	if( p === $_ ) return;
+	this.logic = new game2.Logic(this);
+	this.toys = [];
+	this.states = new Hash();
+}
+game2.Playground.__name__ = ["game2","Playground"];
+game2.Playground.prototype.logic = null;
+game2.Playground.prototype.toys = null;
+game2.Playground.prototype.states = null;
+game2.Playground.prototype.gameover_callback = null;
+game2.Playground.prototype.Draw = function() {
+	buildingblocks.Canvas.Draw();
+}
+game2.Playground.prototype.Step = function() {
+	this.logic.Step();
+}
+game2.Playground.prototype.GameOver = function(cb) {
+	if(cb == null) this.gameover_callback();
+	this.gameover_callback = cb;
+}
+game2.Playground.prototype.AddToy = function(toy) {
+	this.toys.push(toy);
+}
+game2.Playground.prototype.AddRule = function(rule) {
+	this.logic.AddRule(rule);
+}
+game2.Playground.prototype.AddMetaRule = function(metarule) {
+	this.logic.AddMetaRule(metarule);
+}
+game2.Playground.prototype.Exists = function(key) {
+	return this.states.exists(key);
+}
+game2.Playground.prototype.Set = function(key,value) {
+	dispatch.EventCannon.Fire(new game2data.GameEventData(key,value));
+	this.states.set(key,value);
+}
+game2.Playground.prototype.Get = function(key) {
+	return this.states.get(key);
+}
+game2.Playground.prototype.Remove = function(key) {
+	return this.states.remove(key);
+}
+game2.Playground.prototype.__class__ = game2.Playground;
 if(typeof haxe=='undefined') haxe = {}
 haxe.StackItem = { __ename__ : ["haxe","StackItem"], __constructs__ : ["CFunction","Module","FilePos","Method","Lambda"] }
 haxe.StackItem.CFunction = ["CFunction",0];
@@ -82,6 +136,45 @@ haxe.Stack.makeStack = function(s) {
 	return m;
 }
 haxe.Stack.prototype.__class__ = haxe.Stack;
+game2.Logic = function(p) {
+	if( p === $_ ) return;
+	this.rules = [];
+	this.metarules = [];
+	this.playground = p;
+}
+game2.Logic.__name__ = ["game2","Logic"];
+game2.Logic.prototype.rules = null;
+game2.Logic.prototype.metarules = null;
+game2.Logic.prototype.playground = null;
+game2.Logic.prototype.Rules = function() {
+	return this.rules;
+}
+game2.Logic.prototype.AddRule = function(rule) {
+	this.rules.push(rule);
+	return this.rules.length - 1;
+}
+game2.Logic.prototype.MetaRules = function() {
+	return this.metarules;
+}
+game2.Logic.prototype.AddMetaRule = function(metarule) {
+	this.metarules.push(metarule);
+	return this.metarules.length - 1;
+}
+game2.Logic.prototype.Step = function() {
+	var _g = 0, _g1 = this.metarules;
+	while(_g < _g1.length) {
+		var metarule = _g1[_g];
+		++_g;
+		metarule(this);
+	}
+	var _g = 0, _g1 = this.rules;
+	while(_g < _g1.length) {
+		var rule = _g1[_g];
+		++_g;
+		rule(this.playground);
+	}
+}
+game2.Logic.prototype.__class__ = game2.Logic;
 if(typeof buildingblocks=='undefined') buildingblocks = {}
 buildingblocks.CoreObject = function(p) {
 	if( p === $_ ) return;
@@ -244,10 +337,109 @@ tools.Measure.PointInBox = function(p,box_p,box_s) {
 	return false;
 }
 tools.Measure.prototype.__class__ = tools.Measure;
+buildingblocks.Div = function(id) {
+	if( id === $_ ) return;
+	this.self = new js.JQuery(id);
+	this.self.css("position","absolute");
+	this.pos = { x : 0.0, y : 0.0};
+	this.siz = { width : 0.0, height : 0.0};
+}
+buildingblocks.Div.__name__ = ["buildingblocks","Div"];
+buildingblocks.Div.prototype.self = null;
+buildingblocks.Div.prototype.pos = null;
+buildingblocks.Div.prototype.siz = null;
+buildingblocks.Div.prototype.Position = function(p) {
+	var cp = { x : this.self.position().left + buildingblocks.Canvas.Configuration.band_width, y : this.self.position().top + buildingblocks.Canvas.Configuration.band_height};
+	var cs = { width : buildingblocks.Canvas.Configuration.effective_width, height : buildingblocks.Canvas.Configuration.effective_height};
+	if(p != null) {
+		this.pos = p;
+		this.self.css("left",cp.x + p.x / 100 * cs.width + "px");
+		this.self.css("top",cp.y + p.y / 100 * cs.height + "px");
+	}
+	return this.pos;
+}
+buildingblocks.Div.prototype.Size = function(s) {
+	var cs = { width : buildingblocks.Canvas.Configuration.effective_width, height : buildingblocks.Canvas.Configuration.effective_height};
+	if(s != null) {
+		this.siz = s;
+		this.self.css("width",s.width / 100 * cs.width + "px");
+		this.self.css("height",s.height / 100 * cs.height + "px");
+	}
+}
+buildingblocks.Div.prototype.Click = function(cb) {
+	this.self.click(cb);
+}
+buildingblocks.Div.prototype.Mouseover = function(cb) {
+	this.self.mouseover(cb);
+}
+buildingblocks.Div.prototype.Mouseleave = function(cb) {
+	this.self.mouseleave(cb);
+}
+buildingblocks.Div.prototype.Mousemove = function(cb) {
+	this.self.mousemove(cb);
+}
+buildingblocks.Div.prototype.__class__ = buildingblocks.Div;
+Hash = function(p) {
+	if( p === $_ ) return;
+	this.h = {}
+	if(this.h.__proto__ != null) {
+		this.h.__proto__ = null;
+		delete(this.h.__proto__);
+	}
+}
+Hash.__name__ = ["Hash"];
+Hash.prototype.h = null;
+Hash.prototype.set = function(key,value) {
+	this.h["$" + key] = value;
+}
+Hash.prototype.get = function(key) {
+	return this.h["$" + key];
+}
+Hash.prototype.exists = function(key) {
+	try {
+		key = "$" + key;
+		return this.hasOwnProperty.call(this.h,key);
+	} catch( e ) {
+		for(var i in this.h) if( i == key ) return true;
+		return false;
+	}
+}
+Hash.prototype.remove = function(key) {
+	if(!this.exists(key)) return false;
+	delete(this.h["$" + key]);
+	return true;
+}
+Hash.prototype.keys = function() {
+	var a = new Array();
+	for(var i in this.h) a.push(i.substr(1));
+	return a.iterator();
+}
+Hash.prototype.iterator = function() {
+	return { ref : this.h, it : this.keys(), hasNext : function() {
+		return this.it.hasNext();
+	}, next : function() {
+		var i = this.it.next();
+		return this.ref["$" + i];
+	}};
+}
+Hash.prototype.toString = function() {
+	var s = new StringBuf();
+	s.b[s.b.length] = "{" == null?"null":"{";
+	var it = this.keys();
+	while( it.hasNext() ) {
+		var i = it.next();
+		s.b[s.b.length] = i == null?"null":i;
+		s.b[s.b.length] = " => " == null?"null":" => ";
+		s.add(Std.string(this.get(i)));
+		if(it.hasNext()) s.b[s.b.length] = ", " == null?"null":", ";
+	}
+	s.b[s.b.length] = "}" == null?"null":"}";
+	return s.b.join("");
+}
+Hash.prototype.__class__ = Hash;
 if(typeof dispatch=='undefined') dispatch = {}
 dispatch.EventLaser = function() { }
 dispatch.EventLaser.__name__ = ["dispatch","EventLaser"];
-dispatch.EventLaser.core_hash = null;
 dispatch.EventLaser.Fire = function(e,who,pos) {
 	if(!dispatch.EventLaser.core_hash.exists(who + "")) {
 		haxe.Log.trace("No object exists to capture the following event : ",pos);
@@ -364,6 +556,74 @@ StringTools.isEOF = function(c) {
 	return c != c;
 }
 StringTools.prototype.__class__ = StringTools;
+dispatch.Event = function(name,origin) {
+	if( name === $_ ) return;
+	this.name = name;
+	this.origin = origin;
+}
+dispatch.Event.__name__ = ["dispatch","Event"];
+dispatch.Event.prototype.name = null;
+dispatch.Event.prototype.origin = null;
+dispatch.Event.prototype.ToJqEvent = function() {
+	return null;
+}
+dispatch.Event.prototype.__class__ = dispatch.Event;
+if(typeof game2data=='undefined') game2data = {}
+game2data.GameEventData = function(key,value) {
+	if( key === $_ ) return;
+	dispatch.Event.call(this,game2data.GameEventData.Name,0);
+	this.key = key;
+	this.value = value;
+}
+game2data.GameEventData.__name__ = ["game2data","GameEventData"];
+game2data.GameEventData.__super__ = dispatch.Event;
+for(var k in dispatch.Event.prototype ) game2data.GameEventData.prototype[k] = dispatch.Event.prototype[k];
+game2data.GameEventData.prototype.key = null;
+game2data.GameEventData.prototype.value = null;
+game2data.GameEventData.prototype.__class__ = game2data.GameEventData;
+game2.Toy = function(p,data) {
+	if( p === $_ ) return;
+	if(data.div_id != null) this.div = new buildingblocks.Div(data.div_id);
+	if(data.image_id != null) this.image = new buildingblocks.Image(data.image_data);
+	if(data.text_id != null) this.text = new buildingblocks.Text(data.text_data);
+	this.toydata = data;
+	p.AddToy(this);
+}
+game2.Toy.__name__ = ["game2","Toy"];
+game2.Toy.prototype.toydata = null;
+game2.Toy.prototype.image = null;
+game2.Toy.prototype.text = null;
+game2.Toy.prototype.div = null;
+game2.Toy.prototype.Image = function() {
+	return this.image;
+}
+game2.Toy.prototype.Text = function() {
+	return this.text;
+}
+game2.Toy.prototype.Div = function() {
+	return this.div;
+}
+game2.Toy.prototype.Click = function(cb) {
+	if(this.image != null) this.image.Click(cb);
+	if(this.text != null) this.text.Click(cb);
+	if(this.div != null) this.div.Click(cb);
+}
+game2.Toy.prototype.Mouseover = function(cb) {
+	if(this.image != null) this.image.Mouseover(cb);
+	if(this.text != null) this.text.Mouseover(cb);
+	if(this.div != null) this.div.Mouseover(cb);
+}
+game2.Toy.prototype.Mouseleave = function(cb) {
+	if(this.image != null) this.image.Mouseleave(cb);
+	if(this.text != null) this.text.Mouseleave(cb);
+	if(this.div != null) this.div.Mouseleave(cb);
+}
+game2.Toy.prototype.Mousemove = function(cb) {
+	if(this.image != null) this.image.Mousemove(cb);
+	if(this.text != null) this.text.Mousemove(cb);
+	if(this.div != null) this.div.Mousemove(cb);
+}
+game2.Toy.prototype.__class__ = game2.Toy;
 if(!haxe.unit) haxe.unit = {}
 haxe.unit.TestResult = function(p) {
 	if( p === $_ ) return;
@@ -600,15 +860,6 @@ haxespec.FuryTestCase.prototype.assertChange = function(when,from,to,pos) {
 	this.assertTrue(flag,pos);
 }
 haxespec.FuryTestCase.prototype.__class__ = haxespec.FuryTestCase;
-if(typeof furytest=='undefined') furytest = {}
-furytest.BuildingBlocksInteractionTest = function() { }
-furytest.BuildingBlocksInteractionTest.__name__ = ["furytest","BuildingBlocksInteractionTest"];
-furytest.BuildingBlocksInteractionTest.main = function() {
-	var runner = new haxe.unit.TestRunner();
-	runner.add(new buildingblocksspec.InteractionSpec());
-	runner.run();
-}
-furytest.BuildingBlocksInteractionTest.prototype.__class__ = furytest.BuildingBlocksInteractionTest;
 haxe.Log = function() { }
 haxe.Log.__name__ = ["haxe","Log"];
 haxe.Log.trace = function(v,infos) {
@@ -618,6 +869,65 @@ haxe.Log.clear = function() {
 	js.Boot.__clear_trace();
 }
 haxe.Log.prototype.__class__ = haxe.Log;
+haxe.Timer = function(time_ms) {
+	if( time_ms === $_ ) return;
+	var arr = haxe_timers;
+	this.id = arr.length;
+	arr[this.id] = this;
+	this.timerId = window.setInterval("haxe_timers[" + this.id + "].run();",time_ms);
+}
+haxe.Timer.__name__ = ["haxe","Timer"];
+haxe.Timer.delay = function(f,time_ms) {
+	var t = new haxe.Timer(time_ms);
+	t.run = function() {
+		t.stop();
+		f();
+	};
+	return t;
+}
+haxe.Timer.measure = function(f,pos) {
+	var t0 = haxe.Timer.stamp();
+	var r = f();
+	haxe.Log.trace(haxe.Timer.stamp() - t0 + "s",pos);
+	return r;
+}
+haxe.Timer.stamp = function() {
+	return Date.now().getTime() / 1000;
+}
+haxe.Timer.prototype.id = null;
+haxe.Timer.prototype.timerId = null;
+haxe.Timer.prototype.stop = function() {
+	if(this.id == null) return;
+	window.clearInterval(this.timerId);
+	var arr = haxe_timers;
+	arr[this.id] = null;
+	if(this.id > 100 && this.id == arr.length - 1) {
+		var p = this.id - 1;
+		while(p >= 0 && arr[p] == null) p--;
+		arr = arr.slice(0,p + 1);
+	}
+	this.id = null;
+}
+haxe.Timer.prototype.run = function() {
+}
+haxe.Timer.prototype.__class__ = haxe.Timer;
+tools.Stopwatch = function() { }
+tools.Stopwatch.__name__ = ["tools","Stopwatch"];
+tools.Stopwatch.Start = function() {
+	tools.Stopwatch.TIME = haxe.Timer.stamp();
+	return tools.Stopwatch.TIME;
+}
+tools.Stopwatch.Stop = function() {
+	var startTime = tools.Stopwatch.TIME;
+	var difference = tools.Stopwatch.Start() - startTime;
+	return difference;
+}
+tools.Stopwatch.Interval = function(cb,duration) {
+	var timer = new haxe.Timer(duration);
+	timer.run = cb;
+	return timer;
+}
+tools.Stopwatch.prototype.__class__ = tools.Stopwatch;
 StringBuf = function(p) {
 	if( p === $_ ) return;
 	this.b = new Array();
@@ -637,18 +947,6 @@ StringBuf.prototype.toString = function() {
 }
 StringBuf.prototype.b = null;
 StringBuf.prototype.__class__ = StringBuf;
-dispatch.Event = function(name,origin) {
-	if( name === $_ ) return;
-	this.name = name;
-	this.origin = origin;
-}
-dispatch.Event.__name__ = ["dispatch","Event"];
-dispatch.Event.prototype.name = null;
-dispatch.Event.prototype.origin = null;
-dispatch.Event.prototype.ToJqEvent = function() {
-	return null;
-}
-dispatch.Event.prototype.__class__ = dispatch.Event;
 tools.Random = function() { }
 tools.Random.__name__ = ["tools","Random"];
 tools.Random.OneOf = function(stuff) {
@@ -1096,6 +1394,55 @@ haxe.unit.TestRunner.prototype.runCase = function(t) {
 	haxe.Log.trace = old;
 }
 haxe.unit.TestRunner.prototype.__class__ = haxe.unit.TestRunner;
+if(typeof game2spec=='undefined') game2spec = {}
+game2spec.PlaygroundSpec = function(p) {
+	if( p === $_ ) return;
+	haxespec.FuryTestCase.call(this);
+}
+game2spec.PlaygroundSpec.__name__ = ["game2spec","PlaygroundSpec"];
+game2spec.PlaygroundSpec.__super__ = haxespec.FuryTestCase;
+for(var k in haxespec.FuryTestCase.prototype ) game2spec.PlaygroundSpec.prototype[k] = haxespec.FuryTestCase.prototype[k];
+game2spec.PlaygroundSpec.prototype.playground = null;
+game2spec.PlaygroundSpec.prototype.setup = function() {
+	var me = this;
+	this.playground = new game2.Playground();
+	var toydata = specfactory.Game2Factory.ToyData();
+	toydata.text_id = null;
+	toydata.div_id = null;
+	var btn = new game2.Toy(this.playground,toydata);
+	btn.Click(function(e) {
+		var num = Std.parseInt(me.playground.Get("number"));
+		num += 1;
+		me.playground.Set("number",num + "");
+	});
+	var fagdata = specfactory.Game2Factory.ToyData();
+	fagdata.image_id = null;
+	fagdata.div_id = null;
+	fagdata.text_data.text_size = 20;
+	fagdata.text_data.raw_text = "0";
+	var dis = new game2.Toy(this.playground,fagdata);
+	this.playground.GameOver(function() {
+		js.Lib.alert("You win");
+	});
+	this.playground.AddRule(function(p) {
+		var num = Std.parseInt(p.Get("number"));
+		dis.Text().Text(num + "");
+	});
+	this.playground.AddRule(function(p) {
+		var num = Std.parseInt(p.Get("number"));
+		if(num == 10) p.GameOver();
+	});
+}
+game2spec.PlaygroundSpec.prototype.tearDown = function() {
+}
+game2spec.PlaygroundSpec.prototype.testIntegration = function() {
+	var me = this;
+	tools.Stopwatch.Interval(function() {
+		me.playground.Draw();
+		me.playground.Step();
+	},25);
+}
+game2spec.PlaygroundSpec.prototype.__class__ = game2spec.PlaygroundSpec;
 if(typeof js=='undefined') js = {}
 js.Lib = function() { }
 js.Lib.__name__ = ["js","Lib"];
@@ -1270,6 +1617,26 @@ Type.enumIndex = function(e) {
 	return e[1];
 }
 Type.prototype.__class__ = Type;
+buildingblocks.Interaction = function() { }
+buildingblocks.Interaction.__name__ = ["buildingblocks","Interaction"];
+buildingblocks.Interaction.Register = function(type,cb) {
+	if(!buildingblocks.Interaction.Interactions.exists(type)) {
+		throw "Unrecognized action type error : " + type;
+		return -1;
+	}
+	var handler_hash = buildingblocks.Interaction.Interactions.get(type);
+	handler_hash.set(buildingblocks.Interaction.Count + "",cb);
+	buildingblocks.Interaction.Count += 1;
+	return buildingblocks.Interaction.Count - 1;
+}
+buildingblocks.Interaction.Unregister = function(type,key) {
+	if(!buildingblocks.Interaction.Interactions.exists(type)) {
+		throw "Unrecognized action type error : " + type;
+		return false;
+	}
+	return buildingblocks.Interaction.Interactions.get(type).remove(key + "");
+}
+buildingblocks.Interaction.prototype.__class__ = buildingblocks.Interaction;
 js.Boot = function() { }
 js.Boot.__name__ = ["js","Boot"];
 js.Boot.__unhtml = function(s) {
@@ -1451,84 +1818,6 @@ js.Boot.__init = function() {
 	$closure = js.Boot.__closure;
 }
 js.Boot.prototype.__class__ = js.Boot;
-Hash = function(p) {
-	if( p === $_ ) return;
-	this.h = {}
-	if(this.h.__proto__ != null) {
-		this.h.__proto__ = null;
-		delete(this.h.__proto__);
-	}
-}
-Hash.__name__ = ["Hash"];
-Hash.prototype.h = null;
-Hash.prototype.set = function(key,value) {
-	this.h["$" + key] = value;
-}
-Hash.prototype.get = function(key) {
-	return this.h["$" + key];
-}
-Hash.prototype.exists = function(key) {
-	try {
-		key = "$" + key;
-		return this.hasOwnProperty.call(this.h,key);
-	} catch( e ) {
-		for(var i in this.h) if( i == key ) return true;
-		return false;
-	}
-}
-Hash.prototype.remove = function(key) {
-	if(!this.exists(key)) return false;
-	delete(this.h["$" + key]);
-	return true;
-}
-Hash.prototype.keys = function() {
-	var a = new Array();
-	for(var i in this.h) a.push(i.substr(1));
-	return a.iterator();
-}
-Hash.prototype.iterator = function() {
-	return { ref : this.h, it : this.keys(), hasNext : function() {
-		return this.it.hasNext();
-	}, next : function() {
-		var i = this.it.next();
-		return this.ref["$" + i];
-	}};
-}
-Hash.prototype.toString = function() {
-	var s = new StringBuf();
-	s.b[s.b.length] = "{" == null?"null":"{";
-	var it = this.keys();
-	while( it.hasNext() ) {
-		var i = it.next();
-		s.b[s.b.length] = i == null?"null":i;
-		s.b[s.b.length] = " => " == null?"null":" => ";
-		s.add(Std.string(this.get(i)));
-		if(it.hasNext()) s.b[s.b.length] = ", " == null?"null":", ";
-	}
-	s.b[s.b.length] = "}" == null?"null":"}";
-	return s.b.join("");
-}
-Hash.prototype.__class__ = Hash;
-buildingblocks.Interaction = function() { }
-buildingblocks.Interaction.__name__ = ["buildingblocks","Interaction"];
-buildingblocks.Interaction.Register = function(type,cb) {
-	if(!buildingblocks.Interaction.Interactions.exists(type)) {
-		throw "Unrecognized action type error : " + type;
-		return -1;
-	}
-	var handler_hash = buildingblocks.Interaction.Interactions.get(type);
-	handler_hash.set(buildingblocks.Interaction.Count + "",cb);
-	buildingblocks.Interaction.Count += 1;
-	return buildingblocks.Interaction.Count - 1;
-}
-buildingblocks.Interaction.Unregister = function(type,key) {
-	if(!buildingblocks.Interaction.Interactions.exists(type)) {
-		throw "Unrecognized action type error : " + type;
-		return false;
-	}
-	return buildingblocks.Interaction.Interactions.get(type).remove(key + "");
-}
-buildingblocks.Interaction.prototype.__class__ = buildingblocks.Interaction;
 if(typeof specfactory=='undefined') specfactory = {}
 specfactory.BuildingBlocksFactory = function() { }
 specfactory.BuildingBlocksFactory.__name__ = ["specfactory","BuildingBlocksFactory"];
@@ -1551,6 +1840,13 @@ specfactory.BuildingBlocksFactory.Text = function() {
 	return new buildingblocks.Text(specfactory.BuildingBlocksFactory.TextData());
 }
 specfactory.BuildingBlocksFactory.prototype.__class__ = specfactory.BuildingBlocksFactory;
+specfactory.Game2Factory = function() { }
+specfactory.Game2Factory.__name__ = ["specfactory","Game2Factory"];
+specfactory.Game2Factory.ToyData = function() {
+	var output = { image_data : specfactory.BuildingBlocksFactory.ImageData(), image_id : tools.Random.Text(15), text_data : specfactory.BuildingBlocksFactory.TextData(), text_id : tools.Random.Text(15), div_id : tools.Random.Text(15)};
+	return output;
+}
+specfactory.Game2Factory.prototype.__class__ = specfactory.Game2Factory;
 dispatch.EventCannon = function() { }
 dispatch.EventCannon.__name__ = ["dispatch","EventCannon"];
 dispatch.EventCannon.Listen = function(name,cb,pos) {
@@ -1664,49 +1960,6 @@ buildingblocks.Canvas.Draw = function() {
 	buildingblocks.Canvas.Context.fillRect(buildingblocks.Canvas.Configuration.width - band_width,0,band_width,height);
 }
 buildingblocks.Canvas.prototype.__class__ = buildingblocks.Canvas;
-if(typeof buildingblocksspec=='undefined') buildingblocksspec = {}
-buildingblocksspec.InteractionSpec = function(p) {
-	if( p === $_ ) return;
-	haxespec.FuryTestCase.call(this);
-}
-buildingblocksspec.InteractionSpec.__name__ = ["buildingblocksspec","InteractionSpec"];
-buildingblocksspec.InteractionSpec.__super__ = haxespec.FuryTestCase;
-for(var k in haxespec.FuryTestCase.prototype ) buildingblocksspec.InteractionSpec.prototype[k] = haxespec.FuryTestCase.prototype[k];
-buildingblocksspec.InteractionSpec.prototype.image = null;
-buildingblocksspec.InteractionSpec.prototype.image2 = null;
-buildingblocksspec.InteractionSpec.prototype.text = null;
-buildingblocksspec.InteractionSpec.prototype.setup = function() {
-	this.image = specfactory.BuildingBlocksFactory.Image();
-	this.image2 = specfactory.BuildingBlocksFactory.Image();
-	var t_d = specfactory.BuildingBlocksFactory.TextData();
-	t_d.text_size = 25;
-	t_d.raw_text = "Testing";
-	t_d.align = "start";
-	t_d.baseline = "alphabetic";
-	this.text = new buildingblocks.Text(t_d);
-}
-buildingblocksspec.InteractionSpec.prototype.tearDown = function() {
-}
-buildingblocksspec.InteractionSpec.prototype.testFunctionality = function() {
-	var me = this;
-	this.text.Click(function(e) {
-		var a = me.text.Angle() + Math.PI / 20;
-		me.text.Angle(a);
-		buildingblocks.Canvas.Draw();
-	});
-	this.image.Click(function(e) {
-		var a = me.image.Angle() + Math.PI / 16;
-		me.image.Angle(a);
-		buildingblocks.Canvas.Draw();
-	});
-	this.image.Mouseover(function(e) {
-		var a = me.image.Angle() - Math.PI / 16;
-		me.image.Angle(a);
-		buildingblocks.Canvas.Draw();
-	});
-	buildingblocks.Canvas.Draw();
-}
-buildingblocksspec.InteractionSpec.prototype.__class__ = buildingblocksspec.InteractionSpec;
 haxe.unit.TestStatus = function(p) {
 	if( p === $_ ) return;
 	this.done = false;
@@ -1805,6 +2058,51 @@ js.Boot.__init();
 		}};
 	};
 }
+if(typeof(haxe_timers) == "undefined") haxe_timers = [];
+{
+	var d = Date;
+	d.now = function() {
+		return new Date();
+	};
+	d.fromTime = function(t) {
+		var d1 = new Date();
+		d1["setTime"](t);
+		return d1;
+	};
+	d.fromString = function(s) {
+		switch(s.length) {
+		case 8:
+			var k = s.split(":");
+			var d1 = new Date();
+			d1["setTime"](0);
+			d1["setUTCHours"](k[0]);
+			d1["setUTCMinutes"](k[1]);
+			d1["setUTCSeconds"](k[2]);
+			return d1;
+		case 10:
+			var k = s.split("-");
+			return new Date(k[0],k[1] - 1,k[2],0,0,0);
+		case 19:
+			var k = s.split(" ");
+			var y = k[0].split("-");
+			var t = k[1].split(":");
+			return new Date(y[0],y[1] - 1,y[2],t[0],t[1],t[2]);
+		default:
+			throw "Invalid date format : " + s;
+		}
+	};
+	d.prototype["toString"] = function() {
+		var date = this;
+		var m = date.getMonth() + 1;
+		var d1 = date.getDate();
+		var h = date.getHours();
+		var mi = date.getMinutes();
+		var s = date.getSeconds();
+		return date.getFullYear() + "-" + (m < 10?"0" + m:"" + m) + "-" + (d1 < 10?"0" + d1:"" + d1) + " " + (h < 10?"0" + h:"" + h) + ":" + (mi < 10?"0" + mi:"" + mi) + ":" + (s < 10?"0" + s:"" + s);
+	};
+	d.prototype.__class__ = d;
+	d.__name__ = ["Date"];
+}
 {
 	String.prototype.__class__ = String;
 	String.__name__ = ["String"];
@@ -1848,6 +2146,17 @@ buildingblocks.Element.Parent = (function() {
 	if(jq == null) throw "Javascript Placement Error : This code must be placed in the <body> tags";
 	return jq;
 })();
+buildingblocks.Div.Parent = (function() {
+	var p = new js.JQuery("canvas#canvas");
+	if(p == null || p.length <= 0) {
+		throw "No canvas found error, try putting this code after your canvas element";
+		return null;
+	}
+	return p;
+})();
+dispatch.EventLaser.core_hash = new Hash();
+game2data.GameEventData.Name = "Game State Changed Event";
+tools.Stopwatch.TIME = haxe.Timer.stamp();
 js.Lib.onerror = null;
 buildingblocks.Interaction.Actions = ["keydown","keypress","keyup","mouseclick","mouseover","mouseleave","mousemove"];
 buildingblocks.Interaction.Count = 0;
@@ -1937,4 +2246,4 @@ buildingblocks.Canvas.Configuration = (function() {
 	config.band_width = (config.width - config.effective_width) / 2;
 	return config;
 })();
-furytest.BuildingBlocksInteractionTest.main()
+furytest.Game2Test.main()

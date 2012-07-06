@@ -5,7 +5,7 @@ import buildingblocks.CoreObject;
 // Unless you know what you're doing (unless you're me, why would you?), 
 // do NOT use this class directly
 class EventLaser {
-	public static var core_hash : Hash<CoreObject>;
+	public static var core_hash : Hash<CoreObject> = new Hash<CoreObject>();
 	public static function Fire( e : Event, who : Int, ?pos : haxe.PosInfos ) { 
 		if ( !EventLaser.core_hash.exists(who + "") ) { 
 			haxe.Log.trace( "No object exists to capture the following event : ", pos );

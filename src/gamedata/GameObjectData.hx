@@ -1,11 +1,14 @@
 package gamedata;
 import dispatch.Event;
 import game.GameObject;
+import buildingblocks.Image;
+import buildingblocks.Text;
+import buildingblocks.Div;
 
 typedef GameObjectData = { 
-	var size : GameObjectSize;
-	var position : GameObjectPosition;
-	var angle : Float ;
+	var images : Array<Image>;
+	var texts : Array<Text>;
+	var divs : Array<Div>;
 	var id : String;
 } // GameObjectData
 

@@ -12,6 +12,7 @@ class CoreObject {
 		this.core_object_id = CoreObject.Count;
 		CoreObject.Count += 1;
 		this.delegate_hash = new Hash<Array<Event->Void>>();
+		EventLaser.Register(this);
 	} // new 
 	
 	public function Listen4( eventname, callb : Event -> Void ) { 
