@@ -1,5 +1,6 @@
 package pitchdeck;
-
-class Slide {
-
+import game2.Playground;
+class Slide extends Playground {
+	
+	
 } // Slide

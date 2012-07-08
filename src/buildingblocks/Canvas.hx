@@ -102,7 +102,6 @@ class Canvas {
 	
 	// Draw redraws the ENTIRE canvas
 	public static function Draw() { 
-		trace( Canvas.Configuration );
 		// Step 1: Calculate the maximum draw box that will fit in the given resolution
 		var ratio = Canvas.Configuration.ratio;
 		var width = Canvas.Configuration.effective_width;

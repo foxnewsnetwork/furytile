@@ -2,8 +2,11 @@
 
 # Uncomment the desirable target
 # JavaScript target (testing)
--js out/game2-playground.js
--main furytest.Game2Test
+-js out/novel-scene.js
+-main furytest.NovelSceneTest
+
+#-js out/game2-playground.js
+#-main furytest.Game2Test
 
 #-js out/buildingblocks-interaction.js
 #-main furytest.BuildingBlocksInteractionTest

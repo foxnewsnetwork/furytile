@@ -68,4 +68,12 @@ class Div {
 	public function Mousemove( cb ) { 
 		this.self.mousemove(cb);
 	} // Mouseover   
+	
+	public function Hide() { 
+		this.self.hide();
+	} // Hide
+	
+	public function Show() { 
+		this.self.show();
+	} // Show
 } // Div

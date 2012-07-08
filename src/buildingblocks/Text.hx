@@ -36,10 +36,6 @@ class Text extends Element {
 		if ( s != null )
 			this.text_data.text_size = Math.floor( s.height );
 		var w : Float = Canvas.Context.measureText( this.text_data.raw_text ).width + 0.0; 
-		trace( { 
-			width : w , 
-			height : this.text_data.text_size + 0.0 
-		});
 		return { 
 			width : w , 
 			height : this.text_data.text_size + 0.0 

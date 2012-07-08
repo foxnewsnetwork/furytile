@@ -28,6 +28,24 @@ class Toy {
 		p.AddToy(this);
 	} // new
 	
+	public function Hide( ) { 
+		if ( this.image != null )
+			this.image.Hide();
+		if ( this.text != null )
+			this.text.Hide();
+		if ( this.div != null )
+			this.div.Hide();
+	} // Hide
+	
+	public function Show() { 
+		if ( this.image != null )
+			this.image.Show();
+		if ( this.text != null )
+			this.text.Show();
+		if ( this.div != null )
+			this.div.Show();
+	} // Show
+	
 	public function Click( cb ) { 
 		if ( this.image != null )
 			this.image.Click(cb);

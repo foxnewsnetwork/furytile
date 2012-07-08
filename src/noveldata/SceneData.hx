@@ -1,0 +1,5 @@
+package noveldata;
+
+class SceneData {
+
+}
