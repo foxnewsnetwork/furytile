@@ -24,7 +24,8 @@ class AnimationHelper {
 
 typedef Position = { x : Float, y : Float } // Position
 
-typedef AnimationData = { 
+typedef AnimationData = {
+	var animation_id : String; 
 	var image_data : Position -> ImageData;
 	var image_id : String;
 	var image_path : Int -> Position;
@@ -37,3 +38,4 @@ typedef AnimationData = {
 
 // Please note that, for all intents and purposes, all the position functions
 // ought to be serializable into point-tangent pairs
+

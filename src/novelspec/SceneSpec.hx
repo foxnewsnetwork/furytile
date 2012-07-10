@@ -10,7 +10,14 @@ class SceneSpec extends haxespec.FuryTestCase {
 	public override function setup() { 
 		this.scene = new Scene();
 		this.anime = new Animation( this.scene, NovelFactory.AnimationData("image") );
-		this.subs = new Animation( this.scene, NovelFactory.AnimationData( "text" ) );	
+		var original_size = this.anime.Image().Size();
+		this.subs = new Animation( this.scene, NovelFactory.AnimationData( "text" ) );
+		this.anime.Mouseover( function(e) { 
+			this.anime.Image().Size({ width : original_size.width + 2.5, height : original_size.height + 2.5 });
+		} ); // Mousemove	
+		this.anime.Mouseleave( function(e) { 
+			this.anime.Image().Size( original_size );
+		} ); // Mouseleave
 	} // setup
 	public override function tearDown() { } 
 	public function testScene() { 

@@ -1,5 +1,6 @@
 package noveldata;
 
-class SceneData {
-
-}
+typedef SceneData = {
+	var animations : Array<AnimationData>;
+	var interactions : Hash<InteractionData>;
+} // SceneData

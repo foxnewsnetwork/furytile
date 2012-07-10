@@ -3,12 +3,52 @@ import novel.Animation;
 import novel.Novel;
 import novel.Scene;
 import noveldata.AnimationData;
+import noveldata.SceneData;
+import noveldata.InteractionData;
 import buildingblocksdata.ImageData;
 import buildingblocksdata.TextData;
+import tools.Measure;
 
 class NovelFactory {
+
+	public static function AnimationUI() : Hash<AnimationData> { 
+		var actions = [ 'next','back','jump','save' ];
+		var output = new Hash<AnimationData>();
+		for( action in actions ) { 
+			output.set( action, NovelFactory.AnimationData("image") );
+		} // for action
+		return output;
+	} // AnimationUI
+	public static function InteractionData() : InteractionData { 
+		return { 
+			next_animation_id : null ,
+			back_animation_id : null ,
+			mouseover : [ Interaction.Inflate ] ,
+			mouseleave : [ Interaction.None ] ,
+			mousemove : null ,
+			click : [ Interaction.Next, Interaction.Hide ]
+		} // return InteractionData
+	} // InteractionData
+	public static function SceneData() : SceneData { 
+		var interaction_hash = new Hash<InteractionData>();
+		var animation_array = [];
+		for( k in 0...4 ) { 
+			var anime = NovelFactory.AnimationData("image");
+			animation_array.push( anime );
+		} // for k
+		for( k in 0...4 ) { 
+			var interact = NovelFactory.InteractionData();
+			if ( k < 3 )
+				interact.next_animation_id = animation_array[k+1].animation_id;
+			if ( k > 0 )
+				interact.back_animation_id = animation_array[k-1].animation_id;
+			interaction_hash.set( animation_array[k].animation_id, interact );
+		} // for k
+		return { interactions : interaction_hash, animations : animation_array };
+	} // SceneData
 	public static function AnimationData ( ?type : String ) : AnimationData  { 
 		var output = { 
+			animation_id : "novelfactorygenerated " + Measure.Increment(),
 			image_data : null ,
 			image_id : null ,
 			image_path : null ,

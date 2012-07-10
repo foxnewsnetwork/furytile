@@ -79,91 +79,88 @@ novel.Scene.prototype.Load = function(s_data) {
 			var interaction = [s_data.interactions.get(data.animation_id)];
 			var lambda_callback_generator = (function(interaction) {
 				return function(who,choices) {
+					if(choices == null || choices.length == 0) return (function() {
+						return function(e) {
+							return;
+						};
+					})();
 					var original = { size : who.Size(), angle : who.Angle()};
-					var output = (function() {
-						return function(e) {
-							return;
-						};
-					})();
-					var temp = (function() {
-						return function(e) {
-							return;
-						};
-					})();
+					var output_array = [];
 					var _g2 = 0;
 					while(_g2 < choices.length) {
 						var choice = choices[_g2];
 						++_g2;
 						switch( (choice)[1] ) {
 						case 0:
-							temp = (function() {
+							output_array.push((function() {
 								return function(e) {
-									output(e);
 									who.Size(original.size);
 									who.Angle(original.angle);
 								};
-							})();
+							})());
 							break;
 						case 1:
-							temp = (function() {
+							output_array.push((function() {
 								return function(e) {
-									output(e);
 									who.Size({ width : original.size.width + 1.5, height : original.size.height + 1.5});
 								};
-							})();
+							})());
 							break;
 						case 2:
-							temp = (function() {
+							output_array.push((function() {
 								return function(e) {
-									output(e);
 									who.Size({ width : original.size.width - 1.5, height : original.size.height - 1.5});
 								};
-							})();
+							})());
 							break;
 						case 3:
-							temp = (function() {
+							output_array.push((function() {
 								return function(e) {
-									output(e);
 									who.Hide();
 								};
-							})();
+							})());
 							break;
 						case 4:
-							temp = (function() {
+							output_array.push((function() {
 								return function(e) {
-									output(e);
 									who.Show();
 								};
-							})();
+							})());
 							break;
 						case 5:
-							temp = ((function() {
+							output_array.push(((function() {
 								return function(i) {
 									return (function() {
 										return function(e) {
-											output(e);
-											me.animations.get(i.next_animation_id).Show();
+											if(me.animations.exists(i.next_animation_id)) me.animations.get(i.next_animation_id).Show();
 										};
 									})();
 								};
-							})())(interaction[0]);
+							})())(interaction[0]));
 							break;
 						case 6:
-							temp = ((function() {
+							output_array.push(((function() {
 								return function(i) {
 									return (function() {
 										return function(e) {
-											output(e);
-											me.animations.get(i.back_animation_id).Show();
+											if(me.animations.exists(i.back_animation_id)) me.animations.get(i.back_animation_id).Show();
 										};
 									})();
 								};
-							})())(interaction[0]);
+							})())(interaction[0]));
 							break;
 						}
-						output = temp;
 					}
-					return output;
+					return (function() {
+						return function(e) {
+							var _g2 = 0;
+							while(_g2 < output_array.length) {
+								var handler = output_array[_g2];
+								++_g2;
+								handler(e);
+							}
+						};
+					})();
 				};
 			})(interaction);
 			anime.Click(lambda_callback_generator(anime,interaction[0].click));
@@ -205,9 +202,18 @@ novel.Novel.__super__ = novel.Scene;
 for(var k in novel.Scene.prototype ) novel.Novel.prototype[k] = novel.Scene.prototype[k];
 novel.Novel.prototype.scenes = null;
 novel.Novel.prototype.buttons = null;
+novel.Novel.prototype.active_scene = null;
 novel.Novel.prototype.Next = function() {
+	if(this.scenes.length == this.active_scene + 1) return;
+	this.scenes[this.active_scene].Hide();
+	this.active_scene += 1;
+	this.scenes[this.active_scene].Show();
 }
 novel.Novel.prototype.Back = function() {
+	if(this.active_scene == 0) return;
+	this.scenes[this.active_scene].Hide();
+	this.active_scene -= 1;
+	this.scenes[this.active_scene].Show();
 }
 novel.Novel.prototype.Jump = function(page) {
 }
@@ -216,6 +222,13 @@ novel.Novel.prototype.LoadNovel = function(s_data,ui_data) {
 	this.p_buttons(ui_data);
 }
 novel.Novel.prototype.Start = function() {
+	var me = this;
+	this.active_scene = 0;
+	this.scenes[this.active_scene].Show();
+	tools.Stopwatch.Interval(function() {
+		me.Step();
+		me.scenes[me.active_scene].Draw();
+	},30);
 }
 novel.Novel.prototype.p_scenes = function(data) {
 	this.scenes = [];
@@ -226,6 +239,7 @@ novel.Novel.prototype.p_scenes = function(data) {
 		var scene = new novel.Scene();
 		scene.Load(d);
 		this.scenes.push(scene);
+		scene.Hide();
 	}
 }
 novel.Novel.prototype.p_buttons = function(data) {
@@ -236,7 +250,9 @@ novel.Novel.prototype.p_buttons = function(data) {
 	while(_g < actions.length) {
 		var action = actions[_g];
 		++_g;
-		var button = new novel.Animation(this,data.get(action));
+		var anime_data = data.get(action);
+		if(anime_data == null) continue;
+		var button = new novel.Animation(this,anime_data);
 		switch(action) {
 		case "next":
 			button.Click(function(e) {
@@ -265,6 +281,15 @@ novel.Novel.prototype.p_buttons = function(data) {
 	}
 }
 novel.Novel.prototype.__class__ = novel.Novel;
+if(typeof furytest=='undefined') furytest = {}
+furytest.NovelIntegrationTest = function() { }
+furytest.NovelIntegrationTest.__name__ = ["furytest","NovelIntegrationTest"];
+furytest.NovelIntegrationTest.main = function() {
+	var runner = new haxe.unit.TestRunner();
+	runner.add(new novelspec.NovelSpec());
+	runner.run();
+}
+furytest.NovelIntegrationTest.prototype.__class__ = furytest.NovelIntegrationTest;
 Std = function() { }
 Std.__name__ = ["Std"];
 Std["is"] = function(v,t) {
@@ -651,15 +676,6 @@ buildingblocks.Canvas.Draw = function() {
 	buildingblocks.Canvas.Context.fillRect(buildingblocks.Canvas.Configuration.width - band_width,0,band_width,height);
 }
 buildingblocks.Canvas.prototype.__class__ = buildingblocks.Canvas;
-if(typeof furytest=='undefined') furytest = {}
-furytest.NovelSceneTest = function() { }
-furytest.NovelSceneTest.__name__ = ["furytest","NovelSceneTest"];
-furytest.NovelSceneTest.main = function() {
-	var runner = new haxe.unit.TestRunner();
-	runner.add(new novelspec.SceneSpec());
-	runner.run();
-}
-furytest.NovelSceneTest.prototype.__class__ = furytest.NovelSceneTest;
 buildingblocks.CoreObject = function(p) {
 	if( p === $_ ) return;
 	this.core_object_id = buildingblocks.CoreObject.Count;
@@ -1295,130 +1311,6 @@ buildingblocks.Text.prototype.Show = function() {
 	this.index = buildingblocks.Canvas.RegisterText(this);
 }
 buildingblocks.Text.prototype.__class__ = buildingblocks.Text;
-haxe.Public = function() { }
-haxe.Public.__name__ = ["haxe","Public"];
-haxe.Public.prototype.__class__ = haxe.Public;
-haxe.unit.TestCase = function(p) {
-}
-haxe.unit.TestCase.__name__ = ["haxe","unit","TestCase"];
-haxe.unit.TestCase.prototype.currentTest = null;
-haxe.unit.TestCase.prototype.setup = function() {
-}
-haxe.unit.TestCase.prototype.tearDown = function() {
-}
-haxe.unit.TestCase.prototype.print = function(v) {
-	haxe.unit.TestRunner.print(v);
-}
-haxe.unit.TestCase.prototype.assertTrue = function(b,c) {
-	this.currentTest.done = true;
-	if(b == false) {
-		this.currentTest.success = false;
-		this.currentTest.error = "expected true but was false";
-		this.currentTest.posInfos = c;
-		throw this.currentTest;
-	}
-}
-haxe.unit.TestCase.prototype.assertFalse = function(b,c) {
-	this.currentTest.done = true;
-	if(b == true) {
-		this.currentTest.success = false;
-		this.currentTest.error = "expected false but was true";
-		this.currentTest.posInfos = c;
-		throw this.currentTest;
-	}
-}
-haxe.unit.TestCase.prototype.assertEquals = function(expected,actual,c) {
-	this.currentTest.done = true;
-	if(actual != expected) {
-		this.currentTest.success = false;
-		this.currentTest.error = "expected '" + expected + "' but was '" + actual + "'";
-		this.currentTest.posInfos = c;
-		throw this.currentTest;
-	}
-}
-haxe.unit.TestCase.prototype.__class__ = haxe.unit.TestCase;
-haxe.unit.TestCase.__interfaces__ = [haxe.Public];
-if(typeof haxespec=='undefined') haxespec = {}
-haxespec.FuryTestCase = function(p) {
-	if( p === $_ ) return;
-	haxe.unit.TestCase.call(this);
-}
-haxespec.FuryTestCase.__name__ = ["haxespec","FuryTestCase"];
-haxespec.FuryTestCase.__super__ = haxe.unit.TestCase;
-for(var k in haxe.unit.TestCase.prototype ) haxespec.FuryTestCase.prototype[k] = haxe.unit.TestCase.prototype[k];
-haxespec.FuryTestCase.prototype.assertIncludes = function(array,expected,pos) {
-	var flag = false;
-	var _g = 0;
-	while(_g < array.length) {
-		var given = array[_g];
-		++_g;
-		if(given == expected) {
-			flag = true;
-			break;
-		}
-	}
-	if(!flag) {
-		haxe.Log.trace("Expected " + array.toString() + " to contain ",pos);
-		haxe.Log.trace(expected,pos);
-	}
-	this.assertTrue(flag,pos);
-}
-haxespec.FuryTestCase.prototype.assertDifferent = function(expected,actual,pos) {
-	var flag = expected == actual;
-	if(flag) {
-		haxe.Log.trace("Expected ",pos);
-		haxe.Log.trace(expected,pos);
-		haxe.Log.trace(" to be different from ",pos);
-		haxe.Log.trace(actual,pos);
-	}
-	this.assertFalse(flag,pos);
-}
-haxespec.FuryTestCase.prototype.assertChange = function(when,from,to,pos) {
-	when();
-	var flag = from == to;
-	if(!flag) {
-		haxe.Log.trace("Expected ",pos);
-		haxe.Log.trace(from,pos);
-		haxe.Log.trace(" to change to ",pos);
-		haxe.Log.trace(to,pos);
-	}
-	this.assertTrue(flag,pos);
-}
-haxespec.FuryTestCase.prototype.__class__ = haxespec.FuryTestCase;
-if(typeof novelspec=='undefined') novelspec = {}
-novelspec.SceneSpec = function(p) {
-	if( p === $_ ) return;
-	haxespec.FuryTestCase.call(this);
-}
-novelspec.SceneSpec.__name__ = ["novelspec","SceneSpec"];
-novelspec.SceneSpec.__super__ = haxespec.FuryTestCase;
-for(var k in haxespec.FuryTestCase.prototype ) novelspec.SceneSpec.prototype[k] = haxespec.FuryTestCase.prototype[k];
-novelspec.SceneSpec.prototype.scene = null;
-novelspec.SceneSpec.prototype.anime = null;
-novelspec.SceneSpec.prototype.subs = null;
-novelspec.SceneSpec.prototype.setup = function() {
-	var me = this;
-	this.scene = new novel.Scene();
-	this.anime = new novel.Animation(this.scene,specfactory.NovelFactory.AnimationData("image"));
-	var original_size = this.anime.Image().Size();
-	this.subs = new novel.Animation(this.scene,specfactory.NovelFactory.AnimationData("text"));
-	this.anime.Mouseover(function(e) {
-		me.anime.Image().Size({ width : original_size.width + 2.5, height : original_size.height + 2.5});
-	});
-	this.anime.Mouseleave(function(e) {
-		me.anime.Image().Size(original_size);
-	});
-}
-novelspec.SceneSpec.prototype.tearDown = function() {
-}
-novelspec.SceneSpec.prototype.testScene = function() {
-	var me = this;
-	tools.Stopwatch.Interval(function() {
-		me.scene.Step();
-		me.scene.Draw();
-	},30);
-}
-novelspec.SceneSpec.prototype.__class__ = novelspec.SceneSpec;
 if(typeof dispatch=='undefined') dispatch = {}
 dispatch.EventLaser = function() { }
 dispatch.EventLaser.__name__ = ["dispatch","EventLaser"];
@@ -1454,8 +1346,41 @@ dispatch.EventLaser.prototype.__class__ = dispatch.EventLaser;
 if(typeof specfactory=='undefined') specfactory = {}
 specfactory.NovelFactory = function() { }
 specfactory.NovelFactory.__name__ = ["specfactory","NovelFactory"];
+specfactory.NovelFactory.AnimationUI = function() {
+	var actions = ["next","back","jump","save"];
+	var output = new Hash();
+	var _g = 0;
+	while(_g < actions.length) {
+		var action = actions[_g];
+		++_g;
+		output.set(action,specfactory.NovelFactory.AnimationData("image"));
+	}
+	return output;
+}
+specfactory.NovelFactory.InteractionData = function() {
+	return { next_animation_id : null, back_animation_id : null, mouseover : [noveldata.Interaction.Inflate], mouseleave : [noveldata.Interaction.None], mousemove : null, click : [noveldata.Interaction.Next,noveldata.Interaction.Hide]};
+}
+specfactory.NovelFactory.SceneData = function() {
+	var interaction_hash = new Hash();
+	var animation_array = [];
+	var _g = 0;
+	while(_g < 4) {
+		var k = _g++;
+		var anime = specfactory.NovelFactory.AnimationData("image");
+		animation_array.push(anime);
+	}
+	var _g = 0;
+	while(_g < 4) {
+		var k = _g++;
+		var interact = specfactory.NovelFactory.InteractionData();
+		if(k < 3) interact.next_animation_id = animation_array[k + 1].animation_id;
+		if(k > 0) interact.back_animation_id = animation_array[k - 1].animation_id;
+		interaction_hash.set(animation_array[k].animation_id,interact);
+	}
+	return { interactions : interaction_hash, animations : animation_array};
+}
 specfactory.NovelFactory.AnimationData = function(type) {
-	var output = { animation_id : "novelfactorygenerated", image_data : null, image_id : null, image_path : null, text_data : null, text_id : null, text_path : null, div_id : null, div_path : null};
+	var output = { animation_id : "novelfactorygenerated " + tools.Measure.Increment(), image_data : null, image_id : null, image_path : null, text_data : null, text_id : null, text_path : null, div_id : null, div_path : null};
 	switch(type) {
 	case "image":
 		var image_data = specfactory.BuildingBlocksFactory.ImageData();
@@ -1899,6 +1824,117 @@ haxe.Timer.prototype.stop = function() {
 haxe.Timer.prototype.run = function() {
 }
 haxe.Timer.prototype.__class__ = haxe.Timer;
+haxe.Public = function() { }
+haxe.Public.__name__ = ["haxe","Public"];
+haxe.Public.prototype.__class__ = haxe.Public;
+haxe.unit.TestCase = function(p) {
+}
+haxe.unit.TestCase.__name__ = ["haxe","unit","TestCase"];
+haxe.unit.TestCase.prototype.currentTest = null;
+haxe.unit.TestCase.prototype.setup = function() {
+}
+haxe.unit.TestCase.prototype.tearDown = function() {
+}
+haxe.unit.TestCase.prototype.print = function(v) {
+	haxe.unit.TestRunner.print(v);
+}
+haxe.unit.TestCase.prototype.assertTrue = function(b,c) {
+	this.currentTest.done = true;
+	if(b == false) {
+		this.currentTest.success = false;
+		this.currentTest.error = "expected true but was false";
+		this.currentTest.posInfos = c;
+		throw this.currentTest;
+	}
+}
+haxe.unit.TestCase.prototype.assertFalse = function(b,c) {
+	this.currentTest.done = true;
+	if(b == true) {
+		this.currentTest.success = false;
+		this.currentTest.error = "expected false but was true";
+		this.currentTest.posInfos = c;
+		throw this.currentTest;
+	}
+}
+haxe.unit.TestCase.prototype.assertEquals = function(expected,actual,c) {
+	this.currentTest.done = true;
+	if(actual != expected) {
+		this.currentTest.success = false;
+		this.currentTest.error = "expected '" + expected + "' but was '" + actual + "'";
+		this.currentTest.posInfos = c;
+		throw this.currentTest;
+	}
+}
+haxe.unit.TestCase.prototype.__class__ = haxe.unit.TestCase;
+haxe.unit.TestCase.__interfaces__ = [haxe.Public];
+if(typeof haxespec=='undefined') haxespec = {}
+haxespec.FuryTestCase = function(p) {
+	if( p === $_ ) return;
+	haxe.unit.TestCase.call(this);
+}
+haxespec.FuryTestCase.__name__ = ["haxespec","FuryTestCase"];
+haxespec.FuryTestCase.__super__ = haxe.unit.TestCase;
+for(var k in haxe.unit.TestCase.prototype ) haxespec.FuryTestCase.prototype[k] = haxe.unit.TestCase.prototype[k];
+haxespec.FuryTestCase.prototype.assertIncludes = function(array,expected,pos) {
+	var flag = false;
+	var _g = 0;
+	while(_g < array.length) {
+		var given = array[_g];
+		++_g;
+		if(given == expected) {
+			flag = true;
+			break;
+		}
+	}
+	if(!flag) {
+		haxe.Log.trace("Expected " + array.toString() + " to contain ",pos);
+		haxe.Log.trace(expected,pos);
+	}
+	this.assertTrue(flag,pos);
+}
+haxespec.FuryTestCase.prototype.assertDifferent = function(expected,actual,pos) {
+	var flag = expected == actual;
+	if(flag) {
+		haxe.Log.trace("Expected ",pos);
+		haxe.Log.trace(expected,pos);
+		haxe.Log.trace(" to be different from ",pos);
+		haxe.Log.trace(actual,pos);
+	}
+	this.assertFalse(flag,pos);
+}
+haxespec.FuryTestCase.prototype.assertChange = function(when,from,to,pos) {
+	when();
+	var flag = from == to;
+	if(!flag) {
+		haxe.Log.trace("Expected ",pos);
+		haxe.Log.trace(from,pos);
+		haxe.Log.trace(" to change to ",pos);
+		haxe.Log.trace(to,pos);
+	}
+	this.assertTrue(flag,pos);
+}
+haxespec.FuryTestCase.prototype.__class__ = haxespec.FuryTestCase;
+if(typeof novelspec=='undefined') novelspec = {}
+novelspec.NovelSpec = function(p) {
+	if( p === $_ ) return;
+	haxespec.FuryTestCase.call(this);
+}
+novelspec.NovelSpec.__name__ = ["novelspec","NovelSpec"];
+novelspec.NovelSpec.__super__ = haxespec.FuryTestCase;
+for(var k in haxespec.FuryTestCase.prototype ) novelspec.NovelSpec.prototype[k] = haxespec.FuryTestCase.prototype[k];
+novelspec.NovelSpec.prototype.novel = null;
+novelspec.NovelSpec.prototype.setup = function() {
+	this.novel = new novel.Novel();
+	var scene_data = specfactory.NovelFactory.SceneData();
+	var ui_data = specfactory.NovelFactory.AnimationUI();
+	this.novel.LoadNovel([scene_data],ui_data);
+	this.novel.Start();
+}
+novelspec.NovelSpec.prototype.tearDown = function() {
+}
+novelspec.NovelSpec.prototype.testNovel = function() {
+}
+novelspec.NovelSpec.prototype.__class__ = novelspec.NovelSpec;
 StringBuf = function(p) {
 	if( p === $_ ) return;
 	this.b = new Array();
@@ -2135,6 +2171,10 @@ specfactory.Game2Factory.ToyData = function() {
 specfactory.Game2Factory.prototype.__class__ = specfactory.Game2Factory;
 tools.Measure = function() { }
 tools.Measure.__name__ = ["tools","Measure"];
+tools.Measure.Increment = function() {
+	tools.Measure.Count += 1;
+	return tools.Measure.Count;
+}
 tools.Measure.PointInBox = function(p,box_p,box_s) {
 	if(box_p.x <= p.x && p.x <= box_p.x + box_s.width) {
 		if(box_p.y <= p.y && p.y <= box_p.y + box_s.height) return true;
@@ -2588,6 +2628,7 @@ buildingblocks.Interaction.Interactions = (function() {
 	return cb_hash;
 })();
 game2data.GameEventData.Name = "Game State Changed Event";
+tools.Measure.Count = -1;
 tools.Stopwatch.TIME = haxe.Timer.stamp();
 dispatch.EventCannon.event_storage = new Hash();
-furytest.NovelSceneTest.main()
+furytest.NovelIntegrationTest.main()
