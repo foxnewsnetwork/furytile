@@ -2,14 +2,22 @@ package pitchdeck;
 import novel.Novel;
 import novel.Animation;
 import noveldata.AnimationData;
-
+import pitchdeckdata.SlideData;
 class PitchDeck extends Novel {
 	// the "slides"
 	private var slides : Hash<Slide>;
 	private var actions : Array<String>;
 	
 	// Load data
-	public function LoadDeck() { }
+	public function LoadDeck(data : Array<SlideData> ) { 
+		for( sd in data ) { 
+			var slide = new Slide();
+			slide.Load( sd.scene );
+			
+			this.slides.set(sd.name, slide);
+			
+		} // for
+	} // LoadDeck
 	
 	// Constructor
 	public function new() { 
@@ -26,7 +34,7 @@ class PitchDeck extends Novel {
 		this.active_scene = page;
 	} // Jump 
 	
-	private function p_buttons( data : Hash<AnimationData> ) { 
+	private override function p_buttons( data : Hash<AnimationData> ) { 
 		for( k in 0...this.actions.length ) {
 			var act = actions[k]; 
 			var anime_data = data.get( act );
@@ -40,5 +48,20 @@ class PitchDeck extends Novel {
 		} // for act
 	} // p_buttons
 	
+	public override function Step() { 
+		super.Step();
+		for( slide in this.slides ) { 
+			slide.Step();
+		} // for 
+	} // Step
 	
+	public override function Start() { 
+		this.active_scene = 0;
+		this.slides.get( this.actions[0] ).Show();
+		tools.Stopwatch.Interval( function() { 
+			this.Step();
+			var s = this.slides.get( this.actions[this.active_scene] );
+			s.Draw();
+		}, 30 ); // Interval
+	} // Show
 } // PitchDeck

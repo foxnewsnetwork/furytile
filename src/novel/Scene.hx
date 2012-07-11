@@ -16,8 +16,10 @@ class Scene extends Playground {
 	
 	public override function Step( ) { 
 		super.Step();
+		
 		for( animation in this.animations ) { 
 			animation.Step( this.elapsed_frames );
+			
 		} // for animation
 		this.elapsed_frames += 1;
 	} // Step
@@ -26,6 +28,7 @@ class Scene extends Playground {
 		this.animations = new Hash<Animation>();
 		for ( data in s_data.animations ) { 
 			var anime = new Animation( this, data );
+			
 			this.AddAnimation(anime);
 			
 			// Interaciton management

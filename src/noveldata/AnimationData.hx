@@ -6,7 +6,8 @@ import specfactory.Game2Factory;
 
 class AnimationHelper { 
 	 public static function GetToy( data : AnimationData, index : Int ) : ToyData { 
-	 	var toydata = Game2Factory.ToyData();
+	 	
+	 	var toydata = Game2Factory.ToyData(0);
 	 	toydata.image_id = data.image_id;
 	 	toydata.text_id = data.text_id;
 	 	toydata.div_id = data.div_id;

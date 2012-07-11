@@ -132,6 +132,8 @@ class Canvas {
 		for( image in Canvas.Images ) {
 			if( image.visible_flag == false )
 				return; 
+			var raw_source_position = image.Frame();
+			
 			var source_position = image.Jsonify().source_position;
 			var source_size = image.Jsonify().source_size;
 			var position = lambda_converter.Position( image.Jsonify().position  );
@@ -145,8 +147,8 @@ class Canvas {
 			Canvas.Context.rotate( image.Jsonify().angle );
 			Canvas.Context.translate( -shift.x, -shift.y );
 			Canvas.Context.drawImage(image.Source(), 
-				source_position.x, 
-				source_position.y, 
+				source_position.x + raw_source_position.x, 
+				source_position.y + raw_source_position.y, 
 				source_size.width, 
 				source_size.height, 
 				position.x, 

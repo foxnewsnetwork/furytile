@@ -18,10 +18,12 @@ class Animation extends Toy {
 	
 	public function Step( time : Int ) { 
 		var ad = AnimationHelper.GetToy( this.animation_data, time );
+		
 		if ( ad.image_id != null ) { 
 			this.image.Angle( ad.image_data.angle );
 			this.image.Position( ad.image_data.position );
 			this.image.Size( ad.image_data.size );
+			this.image.Frame( ad.image_data.frame );
 		} // if
 		if ( ad.text_id != null ) {
 			this.text.Angle( ad.text_data.angle );
