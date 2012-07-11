@@ -9,6 +9,8 @@ class Novel extends Scene {
 	private var active_scene : Int;
 	public function new() { 
 		super();
+		this.scenes = [];
+		this.buttons = new Hash<Animation>;
 	} // new
 	public function Next() { 
 		if ( this.scenes.length == this.active_scene + 1 )

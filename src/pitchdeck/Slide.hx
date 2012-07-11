@@ -1,6 +1,6 @@
 package pitchdeck;
-import game2.Playground;
-class Slide extends Playground {
+import novel.Scene;
+class Slide extends Scene {
 	
 	
 } // Slide
