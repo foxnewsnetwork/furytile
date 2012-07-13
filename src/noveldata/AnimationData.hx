@@ -13,10 +13,13 @@ class AnimationHelper {
 	 	toydata.div_id = data.div_id;
 	 	
 	 	if( toydata.image_id != null ) { 
-	 		toydata.image_data = data.image_data( data.image_path(index) );
+	 		toydata.image_data = data.image_data( index );
+	 		toydata.image_data.position = data.image_path( index );
+	 		
 	 	} // if
 	 	if ( toydata.text_id != null ) { 
-	 		toydata.text_data = data.text_data( data.text_path(index) );
+	 		toydata.text_data = data.text_data( index );
+	 		toydata.text_data.position = data.text_path( index );
 	 	} // if
 	 	return toydata;
 	 } // GetToy
@@ -27,10 +30,10 @@ typedef Position = { x : Float, y : Float } // Position
 
 typedef AnimationData = {
 	var animation_id : String; 
-	var image_data : Position -> ImageData;
+	var image_data : Int -> ImageData;
 	var image_id : String;
 	var image_path : Int -> Position;
-	var text_data : Position -> TextData;
+	var text_data : Int -> TextData;
 	var text_id : String;
 	var text_path : Int -> Position;
 	var div_id : String;

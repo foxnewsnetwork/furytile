@@ -1,6 +1,13 @@
 package haxespec;
 
 class FuryTestCase extends haxe.unit.TestCase {
+	public function assertMathEqual( a : Array<Float>, b : Array<Float>, ?pos : haxe.PosInfos ) { 
+		if ( a.length != b.length )
+			this.assertTrue(false, pos);
+		for ( k in 0...a.length )
+			this.assertEquals( a[k], b[k], pos );
+	} // assertMathEqual
+	
 	public function assertIncludes<T>( array : Array<T>, expected : T, ?pos : haxe.PosInfos ) : Void { 
 		var flag = false;
 		for( given in array ) { 

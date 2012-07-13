@@ -25,17 +25,17 @@ class Image extends Element {
 		this.index = Canvas.RegisterImage( this );
 		
 		// Step 3: Setting frames (left -> right, up -> down)
-		this.frame = data.frame;
+		this.frame = Math.floor(data.frame);
 		this.jqsource = new JQuery("#furytile-image-preload-" + this.Id() );
 	} // new
 	
-	public function Frame( ?f : Int ) { 
+	public function Frame( ?f : Float ) { 
 		this.max_frames = { 
 			width : Math.floor( this.jqsource.width() / this.image_data.source_size.width ), 
 			height : Math.floor( this.jqsource.height() / this.image_data.source_size.height ) 
 		}; // max_frames
 		if ( f != null ) { 
-			this.frame += 1;
+			this.frame = Math.floor(f);
 			this.frame %= (this.max_frames.width * this.max_frames.height );
 		} // if
 		var fw = this.frame % this.max_frames.width;

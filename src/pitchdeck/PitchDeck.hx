@@ -19,6 +19,11 @@ class PitchDeck extends Novel {
 		} // for
 	} // LoadDeck
 	
+	// Loads buttons
+	public function LoadUI( data : Hash<AnimationData> ) { 
+		this.p_buttons( data );
+	} // LoadUI
+	
 	// Constructor
 	public function new() { 
 		super();

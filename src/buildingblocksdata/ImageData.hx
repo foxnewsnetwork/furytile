@@ -8,7 +8,7 @@ typedef ImageData = {
 	size : { width : Float, height : Float } ,
 	angle : Float , // angle is in radians
 	opacity : Float ,
-	frame : Int // frames go left -> right, up -> down
+	frame : Float // frames go left -> right, up -> down. 
 } // ImageData 
 
 /***

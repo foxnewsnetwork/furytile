@@ -25,7 +25,7 @@ class BuildingBlocksFactory {
 			size : { width : Random.Number(10) + 10.0, height : Random.Number(10) + 10.0 } ,
 			angle : Random.Number(360) / 180 * Math.PI ,
 			opacity : 1.0 ,
-			frame : 0
+			frame : 0.0
 		}; // return
 	} // ImageData
 	public static function Image() : Image { 

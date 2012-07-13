@@ -71,7 +71,6 @@ class NovelFactory {
 				}; // image_path
 				var angle = 0.0;
 				output.image_data = function( p ) { 
-					image_data.position = p;
 					image_data.angle += Math.PI / 50;
 					image_data.angle %= 2 * Math.PI;
 					return image_data;
@@ -88,7 +87,6 @@ class NovelFactory {
 				} // text_path
 				var angle = 0.0;
 				output.text_data = function(p) { 
-					text_data.position = p;
 					text_data.angle += Math.PI / 50;
 					text_data.angle %= 2 * Math.PI;
 					return text_data;

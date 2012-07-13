@@ -2,6 +2,15 @@ package tools;
 
 // Macros for generating convenient integer randoms
 class Random {
+	
+	public static function Vector( ?len : Int ) { 
+		var l = len == null? 1 : len;
+		var output = [];
+		for( k in 0...l )
+			output.push( Random.Number(100) + 0.0 );
+		return output;
+	} // Vector
+	
 	public static function OneOf<T>( stuff : Array<T> ) { 
 		return stuff[Random.Number(stuff.length)];
 	} // OneOf

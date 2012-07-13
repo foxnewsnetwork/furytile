@@ -998,6 +998,14 @@ haxespec.FuryTestCase = function(p) {
 haxespec.FuryTestCase.__name__ = ["haxespec","FuryTestCase"];
 haxespec.FuryTestCase.__super__ = haxe.unit.TestCase;
 for(var k in haxe.unit.TestCase.prototype ) haxespec.FuryTestCase.prototype[k] = haxe.unit.TestCase.prototype[k];
+haxespec.FuryTestCase.prototype.assertMathEqual = function(a,b,pos) {
+	if(a.length != b.length) this.assertTrue(false,pos);
+	var _g1 = 0, _g = a.length;
+	while(_g1 < _g) {
+		var k = _g1++;
+		this.assertEquals(a[k],b[k],pos);
+	}
+}
 haxespec.FuryTestCase.prototype.assertIncludes = function(array,expected,pos) {
 	var flag = false;
 	var _g = 0;
@@ -1048,6 +1056,8 @@ for(var k in haxespec.FuryTestCase.prototype ) pitchdeckspec.PitchDeckSpec.proto
 pitchdeckspec.PitchDeckSpec.prototype.pitchdeck = null;
 pitchdeckspec.PitchDeckSpec.prototype.setup = function() {
 	this.pitchdeck = new pitchdeck.PitchDeck();
+	var ui_data = specfactory.PitchDeckFactory.UIData();
+	this.pitchdeck.LoadUI(ui_data);
 	var problem_data = specfactory.PitchDeckFactory.SlideData("problem");
 	this.pitchdeck.LoadDeck([problem_data]);
 	this.pitchdeck.Start();
@@ -1055,6 +1065,22 @@ pitchdeckspec.PitchDeckSpec.prototype.setup = function() {
 pitchdeckspec.PitchDeckSpec.prototype.tearDown = function() {
 }
 pitchdeckspec.PitchDeckSpec.prototype.testPitchDeck = function() {
+}
+pitchdeckspec.PitchDeckSpec.prototype.fasdftestConverterLinear = function() {
+	var a = tools.Random.Vector(7);
+	var b = tools.Random.Vector(7);
+	var linear = tools.Converter.GetLine(a,b);
+	this.assertMathEqual(linear(0.0),a,{ fileName : "PitchDeckSpec.hx", lineNumber : 33, className : "pitchdeckspec.PitchDeckSpec", methodName : "fasdftestConverterLinear"});
+	this.assertMathEqual(linear(100.0),b,{ fileName : "PitchDeckSpec.hx", lineNumber : 34, className : "pitchdeckspec.PitchDeckSpec", methodName : "fasdftestConverterLinear"});
+}
+pitchdeckspec.PitchDeckSpec.prototype.asdftestConverterQuad = function() {
+	var a = tools.Random.Vector(8);
+	var b = tools.Random.Vector(8);
+	var c = tools.Random.Vector(8);
+	var quad = tools.Converter.GetQuadratic(a,b,c);
+	this.assertMathEqual(quad(-1.0),a,{ fileName : "PitchDeckSpec.hx", lineNumber : 42, className : "pitchdeckspec.PitchDeckSpec", methodName : "asdftestConverterQuad"});
+	this.assertMathEqual(quad(0.0),b,{ fileName : "PitchDeckSpec.hx", lineNumber : 43, className : "pitchdeckspec.PitchDeckSpec", methodName : "asdftestConverterQuad"});
+	this.assertMathEqual(quad(1.0),c,{ fileName : "PitchDeckSpec.hx", lineNumber : 44, className : "pitchdeckspec.PitchDeckSpec", methodName : "asdftestConverterQuad"});
 }
 pitchdeckspec.PitchDeckSpec.prototype.__class__ = pitchdeckspec.PitchDeckSpec;
 if(typeof noveldata=='undefined') noveldata = {}
@@ -1065,8 +1091,14 @@ noveldata.AnimationHelper.GetToy = function(data,index) {
 	toydata.image_id = data.image_id;
 	toydata.text_id = data.text_id;
 	toydata.div_id = data.div_id;
-	if(toydata.image_id != null) toydata.image_data = data.image_data(data.image_path(index));
-	if(toydata.text_id != null) toydata.text_data = data.text_data(data.text_path(index));
+	if(toydata.image_id != null) {
+		toydata.image_data = data.image_data(index);
+		toydata.image_data.position = data.image_path(index);
+	}
+	if(toydata.text_id != null) {
+		toydata.text_data = data.text_data(index);
+		toydata.text_data.position = data.text_path(index);
+	}
 	return toydata;
 }
 noveldata.AnimationHelper.prototype.__class__ = noveldata.AnimationHelper;
@@ -1163,6 +1195,16 @@ haxe.unit.TestRunner.prototype.__class__ = haxe.unit.TestRunner;
 if(typeof tools=='undefined') tools = {}
 tools.Random = function() { }
 tools.Random.__name__ = ["tools","Random"];
+tools.Random.Vector = function(len) {
+	var l = len == null?1:len;
+	var output = [];
+	var _g = 0;
+	while(_g < l) {
+		var k = _g++;
+		output.push(tools.Random.Number(100) + 0.0);
+	}
+	return output;
+}
 tools.Random.OneOf = function(stuff) {
 	return stuff[tools.Random.Number(stuff.length)];
 }
@@ -1496,7 +1538,6 @@ specfactory.NovelFactory.AnimationData = function(type) {
 		};
 		var angle = 0.0;
 		output.image_data = function(p) {
-			image_data.position = p;
 			image_data.angle += Math.PI / 50;
 			image_data.angle %= 2 * Math.PI;
 			return image_data;
@@ -1511,7 +1552,6 @@ specfactory.NovelFactory.AnimationData = function(type) {
 		};
 		var angle = 0.0;
 		output.text_data = function(p) {
-			text_data.position = p;
 			text_data.angle += Math.PI / 50;
 			text_data.angle %= 2 * Math.PI;
 			return text_data;
@@ -1547,6 +1587,9 @@ pitchdeck.PitchDeck.prototype.LoadDeck = function(data) {
 		slide.Load(sd.scene);
 		this.slides.set(sd.name,slide);
 	}
+}
+pitchdeck.PitchDeck.prototype.LoadUI = function(data) {
+	this.p_buttons(data);
 }
 pitchdeck.PitchDeck.prototype.Jump = function(page) {
 	var act = this.actions[page];
@@ -1699,6 +1742,65 @@ buildingblocks.Interaction.Unregister = function(type,key) {
 	return buildingblocks.Interaction.Interactions.get(type).remove(key + "");
 }
 buildingblocks.Interaction.prototype.__class__ = buildingblocks.Interaction;
+tools.Converter = function() { }
+tools.Converter.__name__ = ["tools","Converter"];
+tools.Converter.GetLine = function(a,b) {
+	if(a.length != b.length) {
+		throw "Dumbass exception found in converter. Unmatching dimensions.";
+		return null;
+	}
+	return function(t) {
+		var c = b.copy();
+		var _g1 = 0, _g = c.length;
+		while(_g1 < _g) {
+			var k = _g1++;
+			c[k] = (b[k] - a[k]) / 100 * t + a[k];
+		}
+		return c;
+	};
+}
+tools.Converter.GetQuadratic = function(a,b,c) {
+	if(a.length != b.length || b.length != c.length) {
+		throw "Dumbass exception found in converter. Unmatching dimensions.";
+		return null;
+	}
+	var T = [[1 / 2,-1.0,1 / 2],[-1 / 2,0.0,1 / 2],[0.0,1.0,0.0]];
+	var X = [a,b,c];
+	var K = [tools.Converter.GetZeroes(a.length),tools.Converter.GetZeroes(a.length),tools.Converter.GetZeroes(a.length)];
+	var _g = 0;
+	while(_g < 3) {
+		var i = _g++;
+		var _g1 = 0;
+		while(_g1 < 3) {
+			var j = _g1++;
+			var _g3 = 0, _g2 = a.length;
+			while(_g3 < _g2) {
+				var m = _g3++;
+				K[i][m] += T[i][j] * X[j][m];
+			}
+		}
+	}
+	return function(t) {
+		var output = tools.Converter.GetZeroes(a.length);
+		var _g1 = 0, _g = output.length;
+		while(_g1 < _g) {
+			var k = _g1++;
+			output[k] = K[0][k] * t * t + K[1][k] * t + K[2][k];
+		}
+		return output;
+	};
+}
+tools.Converter.GetZeroes = function(len) {
+	var l = len == null?1:len;
+	var output = new Array();
+	var _g = 0;
+	while(_g < l) {
+		var k = _g++;
+		output.push(0.0);
+	}
+	return output;
+}
+tools.Converter.prototype.__class__ = tools.Converter;
 haxe.StackItem = { __ename__ : ["haxe","StackItem"], __constructs__ : ["CFunction","Module","FilePos","Method","Lambda"] }
 haxe.StackItem.CFunction = ["CFunction",0];
 haxe.StackItem.CFunction.toString = $estr;
@@ -2020,7 +2122,7 @@ specfactory.BuildingBlocksFactory.CanvasData = function() {
 	return { ratio : tools.Random.Number(300) / 100, width : tools.Random.Number(1440) + 0.0, height : tools.Random.Number(900) + 0.0};
 }
 specfactory.BuildingBlocksFactory.ImageData = function() {
-	return { source : "madotsuki.png", source_position : { x : 0.0, y : 0.0}, source_size : { width : 60.0, height : 60.0}, position : { x : tools.Random.Number(100) + 0.0, y : tools.Random.Number(100) + 0.0}, size : { width : tools.Random.Number(10) + 10.0, height : tools.Random.Number(10) + 10.0}, angle : tools.Random.Number(360) / 180 * Math.PI, opacity : 1.0, frame : 0};
+	return { source : "madotsuki.png", source_position : { x : 0.0, y : 0.0}, source_size : { width : 60.0, height : 60.0}, position : { x : tools.Random.Number(100) + 0.0, y : tools.Random.Number(100) + 0.0}, size : { width : tools.Random.Number(10) + 10.0, height : tools.Random.Number(10) + 10.0}, angle : tools.Random.Number(360) / 180 * Math.PI, opacity : 1.0, frame : 0.0};
 }
 specfactory.BuildingBlocksFactory.Image = function() {
 	return new buildingblocks.Image(specfactory.BuildingBlocksFactory.ImageData());
@@ -2258,6 +2360,38 @@ for(var k in novel.Scene.prototype ) pitchdeck.Slide.prototype[k] = novel.Scene.
 pitchdeck.Slide.prototype.__class__ = pitchdeck.Slide;
 specfactory.PitchDeckFactory = function() { }
 specfactory.PitchDeckFactory.__name__ = ["specfactory","PitchDeckFactory"];
+specfactory.PitchDeckFactory.UIData = function() {
+	var actions = ["problem","solution","finance","comparison"];
+	var output = new Hash();
+	var _g1 = 0, _g = actions.length;
+	while(_g1 < _g) {
+		var k = [_g1++];
+		var act = actions[k[0]];
+		var button = specfactory.NovelFactory.AnimationData("image");
+		button.image_path = (function(k) {
+			return function(f) {
+				return { x : 5.0 + 5 * k[0], y : 2.0};
+			};
+		})(k);
+		var image_data = specfactory.BuildingBlocksFactory.ImageData();
+		image_data.source = "chara4.gif";
+		image_data.source_size = { width : 32.0, height : 32.0};
+		image_data.position = { x : 0.0, y : 0.0};
+		image_data.size = { width : 5.5, height : 5.5};
+		image_data.frame = k[0];
+		button.image_data = ((function() {
+			return function(i) {
+				return (function() {
+					return function(f) {
+						return i;
+					};
+				})();
+			};
+		})())(image_data);
+		output.set(act,button);
+	}
+	return output;
+}
 specfactory.PitchDeckFactory.SlideData = function(type) {
 	var slide_data = { name : type, scene : null};
 	switch(type) {
@@ -2271,8 +2405,7 @@ specfactory.PitchDeckFactory.SlideData = function(type) {
 		animation_data.image_path = function(f) {
 			return { x : 40 + 10 * Math.cos(f / 50), y : 50 + 5 * Math.sin(f / 60)};
 		};
-		animation_data.image_data = function(p) {
-			image_data.position = p;
+		animation_data.image_data = function(f) {
 			image_data.angle += Math.PI / 360;
 			image_data.angle %= 2 * Math.PI;
 			image_data.frame += 1;
@@ -2493,7 +2626,7 @@ buildingblocks.Image = function(data) {
 	buildingblocks.Element.Parent.append(source_txt);
 	this.source = js.Lib.document.getElementById("furytile-image-preload-" + this.Id());
 	this.index = buildingblocks.Canvas.RegisterImage(this);
-	this.frame = data.frame;
+	this.frame = Math.floor(data.frame);
 	this.jqsource = new js.JQuery("#furytile-image-preload-" + this.Id());
 }
 buildingblocks.Image.__name__ = ["buildingblocks","Image"];
@@ -2507,7 +2640,7 @@ buildingblocks.Image.prototype.max_frames = null;
 buildingblocks.Image.prototype.Frame = function(f) {
 	this.max_frames = { width : Math.floor(this.jqsource.width() / this.image_data.source_size.width), height : Math.floor(this.jqsource.height() / this.image_data.source_size.height)};
 	if(f != null) {
-		this.frame += 1;
+		this.frame = Math.floor(f);
 		this.frame %= this.max_frames.width * this.max_frames.height;
 	}
 	var fw = this.frame % this.max_frames.width;
